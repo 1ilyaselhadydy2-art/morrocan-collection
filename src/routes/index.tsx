@@ -1,6 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
 import logoAsset from "@/assets/haydar-logo.png.asset.json";
-import vestAsset from "@/assets/haydar-vest.jpg.asset.json";
+import heroVideo from "@/assets/haydar-hero.mp4.asset.json";
+import heroImage from "@/assets/haydar-hero.jpg.asset.json";
+import detailImage from "@/assets/haydar-detail.jpg.asset.json";
+import embroideryImage from "@/assets/haydar-embroidery.jpg.asset.json";
 
 export const Route = createFileRoute("/")({
   component: Index,
@@ -10,7 +13,7 @@ function Index() {
   return (
     <div className="min-h-screen bg-background text-foreground">
       <header className="absolute top-0 left-0 right-0 z-20 flex items-center justify-between px-8 py-6 md:px-16">
-        <img src={logoAsset.url} alt="Haydar" className="h-12 md:h-14 brightness-0 invert opacity-90" />
+        <img src={logoAsset.url} alt="Haydar" className="h-20 md:h-28 brightness-0 invert" />
         <nav className="hidden md:flex items-center gap-10 text-sm tracking-widest uppercase text-white/80">
           <a href="#collection" className="hover:text-white transition">Collection</a>
           <a href="#heritage" className="hover:text-white transition">Heritage</a>
@@ -27,7 +30,7 @@ function Index() {
             Where Tradition<br/>Meets <em className="text-[oklch(0.72_0.14_75)] not-italic">Elegance</em>
           </h1>
           <p className="text-lg text-white/80 max-w-md mb-10 leading-relaxed">
-            The Haydar vest — a modern silhouette woven with centuries-old Moroccan artistry. Each piece hand-embroidered by master artisans of Fès.
+            The official Moroccan team waistcoat for the FIFA World Cup 2026. Woven in Fès with centuries old artistry, embroidered with the green star and the Maroc 2026 trophy.
           </p>
           <div className="flex flex-wrap gap-4">
             <a href="#collection" className="bg-[oklch(0.72_0.14_75)] text-[oklch(0.22_0.03_40)] px-8 py-4 text-sm tracking-widest uppercase hover:bg-white transition font-medium">Discover the Vest</a>
@@ -38,7 +41,14 @@ function Index() {
           </div>
         </div>
         <div className="relative min-h-[60vh] md:min-h-screen">
-          <img src={vestAsset.url} alt="Haydar burgundy Moroccan vest with green star embroidery" className="absolute inset-0 w-full h-full object-cover" />
+          <video
+            src={heroVideo.url}
+            autoPlay
+            muted
+            loop
+            playsInline
+            className="absolute inset-0 w-full h-full object-cover"
+          />
           <div className="absolute inset-0 bg-gradient-to-r from-[oklch(0.38_0.14_20)] via-transparent to-transparent md:from-[oklch(0.38_0.14_20)]/60" />
           <div className="absolute bottom-8 right-8 bg-white/95 backdrop-blur px-6 py-4 text-xs tracking-widest uppercase text-[oklch(0.22_0.03_40)] shadow-2xl">
             <span className="text-[oklch(0.55_0.18_145)]">★</span> Signature Star Edition
@@ -51,9 +61,9 @@ function Index() {
         <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-16 items-center">
           <div className="order-2 md:order-1">
             <span className="text-xs tracking-[0.3em] uppercase text-[oklch(0.55_0.16_40)] mb-4 block">The Signature Piece</span>
-            <h2 className="font-serif text-4xl md:text-5xl mb-6 leading-tight">The Burgundy Star Vest</h2>
+            <h2 className="font-serif text-4xl md:text-5xl mb-6 leading-tight">The Maroc 2026 Waistcoat</h2>
             <p className="text-muted-foreground leading-relaxed mb-8">
-              Cut from densely woven wool in a deep marrakchi burgundy, the Haydar vest is trimmed with hand-braided sfifa in gold and emerald. A single embroidered star — the emblem of Morocco — anchors the chest.
+              Cut from densely woven wool in a deep marrakchi burgundy, the Haydar waistcoat celebrates the Moroccan team at the FIFA World Cup 2026. Trimmed with hand braided sfifa in emerald green, the chest bears the national star while the hem carries the golden Maroc 2026 trophy.
             </p>
             <dl className="grid grid-cols-2 gap-6 mb-10 border-t border-border pt-8">
               <div><dt className="text-xs tracking-widest uppercase text-muted-foreground mb-1">Fabric</dt><dd className="font-serif text-lg">Wool blend</dd></div>
@@ -69,7 +79,8 @@ function Index() {
           </div>
           <div className="order-1 md:order-2 relative">
             <div className="absolute -inset-4 bg-[oklch(0.94_0.02_75)] -z-10" />
-            <img src={vestAsset.url} alt="Haydar vest detail" className="w-full aspect-[3/4] object-cover" />
+            <img src={detailImage.url} alt="Haydar waistcoat green star and sfifa detail" className="w-full aspect-[3/4] object-cover" />
+            <img src={embroideryImage.url} alt="Maroc 2026 golden trophy embroidery" className="hidden md:block absolute -bottom-10 -left-10 w-40 aspect-square object-cover border-8 border-background shadow-2xl" />
           </div>
         </div>
       </section>
@@ -80,13 +91,13 @@ function Index() {
           <span className="text-xs tracking-[0.3em] uppercase text-[oklch(0.55_0.16_40)] mb-4 block">Heritage</span>
           <h2 className="font-serif text-4xl md:text-5xl mb-8 leading-tight">Woven in the medinas of Fès</h2>
           <p className="text-lg text-muted-foreground leading-relaxed max-w-2xl mx-auto mb-16">
-            Every Haydar piece begins in a small atelier where three generations of tailors have preserved the sfifa braiding technique. We work with them directly — no middlemen, no shortcuts.
+            Every Haydar piece begins in a small atelier where three generations of tailors have preserved the sfifa braiding technique. We work with them directly, no middlemen, no shortcuts.
           </p>
           <div className="grid md:grid-cols-3 gap-12 text-left">
             {[
               { n: "01", t: "Hand-woven", d: "Traditional looms operated by master weavers with decades of practice." },
               { n: "02", t: "Naturally dyed", d: "Deep burgundies pulled from madder root; greens from mint and pomegranate." },
-              { n: "03", t: "Star embroidered", d: "The five-point star stitched by hand — the mark of a finished Haydar." },
+              { n: "03", t: "Star embroidered", d: "The five point star and the Maroc 2026 trophy stitched by hand, the mark of a finished Haydar." },
             ].map((s) => (
               <div key={s.n} className="border-t border-[oklch(0.72_0.14_75)] pt-6">
                 <span className="text-[oklch(0.72_0.14_75)] font-serif text-2xl">{s.n}</span>
@@ -100,7 +111,7 @@ function Index() {
 
       {/* CTA / CONTACT */}
       <section id="contact" className="py-24 md:py-32 px-8 md:px-16 text-white text-center" style={{ background: "var(--gradient-hero)" }}>
-        <img src={logoAsset.url} alt="Haydar" className="h-16 mx-auto mb-8 brightness-0 invert opacity-90" />
+        <img src={logoAsset.url} alt="Haydar" className="h-28 md:h-36 mx-auto mb-8 brightness-0 invert" />
         <h2 className="font-serif text-4xl md:text-6xl max-w-3xl mx-auto mb-6 leading-tight">Wear a piece of Morocco.</h2>
         <p className="text-white/70 max-w-xl mx-auto mb-10">Limited quantities. Each vest is numbered and shipped from Fès within seven days.</p>
         <form className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
