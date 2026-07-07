@@ -59,6 +59,9 @@
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
+  --color-burgundy: var(--burgundy);
+  --color-moroccan-green: var(--moroccan-green);
+  --color-gold: var(--gold);
 }
 
 :root {
