@@ -118,10 +118,8 @@ function Index() {
             </div>
             <a href="#contact" className="inline-block bg-[oklch(0.38_0.14_20)] text-white px-10 py-4 text-sm tracking-widest uppercase hover:bg-[oklch(0.28_0.10_25)] transition" style={{ boxShadow: "var(--shadow-elegant)" }}>Reserve Yours</a>
           </div>
-          <div className="order-1 md:order-2 relative">
-            <div className="absolute -inset-4 bg-[oklch(0.94_0.02_75)] -z-10" />
-            <img src={detailImage.url} alt="Haydar waistcoat green star and sfifa detail" className="w-full aspect-[3/4] object-cover" />
-            <img src={embroideryImage.url} alt="Maroc 2026 golden trophy embroidery" className="hidden md:block absolute -bottom-10 -left-10 w-40 aspect-square object-cover border-8 border-background shadow-2xl" />
+          <div className="order-1 md:order-2">
+            <AutoCarousel />
           </div>
         </div>
       </section>
