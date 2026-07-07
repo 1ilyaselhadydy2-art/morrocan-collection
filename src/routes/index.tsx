@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
 import logoAsset from "@/assets/haydar-logo.png.asset.json";
 import heroVideo from "@/assets/haydar-hero.mp4.asset.json";
 import heroImage from "@/assets/haydar-hero.jpg.asset.json";
@@ -8,6 +9,46 @@ import embroideryImage from "@/assets/haydar-embroidery.jpg.asset.json";
 export const Route = createFileRoute("/")({
   component: Index,
 });
+
+const gallery = [
+  { src: heroImage.url, alt: "Haydar waistcoat worn in the medina of Essaouira" },
+  { src: detailImage.url, alt: "Green star and sfifa braiding detail" },
+  { src: embroideryImage.url, alt: "Maroc 2026 golden trophy embroidery" },
+];
+
+function AutoCarousel() {
+  const [i, setI] = useState(0);
+  useEffect(() => {
+    const id = setInterval(() => setI((v) => (v + 1) % gallery.length), 3500);
+    return () => clearInterval(id);
+  }, []);
+  return (
+    <div className="relative">
+      <div className="absolute -inset-4 bg-[oklch(0.94_0.02_75)] -z-10" />
+      <div className="relative w-full aspect-[3/4] overflow-hidden">
+        {gallery.map((g, idx) => (
+          <img
+            key={g.src}
+            src={g.src}
+            alt={g.alt}
+            className="absolute inset-0 w-full h-full object-cover transition-opacity duration-1000"
+            style={{ opacity: i === idx ? 1 : 0 }}
+          />
+        ))}
+        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 z-10">
+          {gallery.map((_, idx) => (
+            <button
+              key={idx}
+              onClick={() => setI(idx)}
+              aria-label={`Show image ${idx + 1}`}
+              className={`h-1.5 rounded-full transition-all ${i === idx ? "w-8 bg-white" : "w-4 bg-white/50"}`}
+            />
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
 
 function Index() {
   return (
