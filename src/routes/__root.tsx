@@ -77,14 +77,14 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Lovable App" },
-      { name: "description", content: "Lovable Generated Project" },
-      { name: "author", content: "Lovable" },
-      { property: "og:title", content: "Lovable App" },
-      { property: "og:description", content: "Lovable Generated Project" },
+      { title: "Haydar — Where Tradition Meets Elegance" },
+      { name: "description", content: "Handcrafted Moroccan vests blending heritage weaving with modern tailoring." },
+      { name: "author", content: "Haydar" },
+      { property: "og:title", content: "Haydar — Where Tradition Meets Elegance" },
+      { property: "og:description", content: "Handcrafted Moroccan vests blending heritage weaving with modern tailoring." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:site", content: "@Lovable" },
+      { name: "twitter:site", content: "@Haydar" },
     ],
     links: [
       {
