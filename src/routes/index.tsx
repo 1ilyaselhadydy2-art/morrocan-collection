@@ -66,9 +66,9 @@ function Index() {
       {/* HERO */}
       <section className="relative min-h-screen grid md:grid-cols-2" style={{ background: "var(--gradient-hero)" }}>
         <div className="flex flex-col justify-center px-8 md:px-16 py-32 text-white relative z-10">
-          <span className="text-xs tracking-[0.4em] uppercase text-[oklch(0.72_0.14_75)] mb-6">Moroccan Craftsmanship · Est. Handmade</span>
+          <span className="text-xs tracking-[0.4em] uppercase text-fabric mb-6">Moroccan Craftsmanship · Est. Handmade</span>
           <h1 className="font-serif text-5xl md:text-7xl leading-[1.05] mb-8">
-            Where Tradition<br/>Meets <em className="text-[oklch(0.72_0.14_75)] not-italic">Elegance</em>
+            Where Tradition<br/>Meets <em className="text-fabric not-italic">Elegance</em>
           </h1>
           <p className="text-lg text-white/80 max-w-md mb-10 leading-relaxed">
             The official Moroccan team waistcoat for the FIFA World Cup 2026. Woven in Fès with centuries old artistry, embroidered with the green star and the Maroc 2026 trophy.
