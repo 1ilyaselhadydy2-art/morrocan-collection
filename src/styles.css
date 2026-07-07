@@ -142,6 +142,17 @@
   --sidebar-ring: oklch(0.551 0.027 264.364);
 }
 
+@utility text-fabric {
+  background-color: var(--gold);
+  background-image:
+    repeating-linear-gradient(90deg, transparent, transparent 2px, rgba(0, 0, 0, 0.08) 2px, rgba(0, 0, 0, 0.08) 3px),
+    repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255, 255, 255, 0.12) 2px, rgba(255, 255, 255, 0.12) 3px);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.3));
+}
+
 @layer base {
   * {
     border-color: var(--color-border);
@@ -152,3 +163,4 @@
     color: var(--color-foreground);
   }
 }
+
