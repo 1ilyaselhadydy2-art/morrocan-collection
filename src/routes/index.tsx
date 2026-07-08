@@ -21,7 +21,6 @@ const APPS_SCRIPT_URL =
 const PRODUCT_NAME = "Haydar Maroc 2026 Waistcoat";
 const PRODUCT_PRICE = "189";
 const SIZES = ["S", "M", "L", "XL", "XXL"];
-const COLORS = ["Burgundy", "Green", "Black", "White"];
 
 declare global {
   interface Window {
@@ -31,37 +30,53 @@ declare global {
 
 function OrderForm() {
   const [status, setStatus] = useState<"idle" | "sending" | "ok" | "error">("idle");
+  const [errorMsg, setErrorMsg] = useState<string>("");
   const [qty, setQty] = useState(1);
 
   async function onSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const form = e.currentTarget;
     const fd = new FormData(form);
-    const payload = new URLSearchParams({
+    const payload = {
       Date: new Date().toISOString(),
       Nom: String(fd.get("nom") ?? ""),
       Téléphone: String(fd.get("telephone") ?? ""),
       Ville: String(fd.get("ville") ?? ""),
       Produit: String(fd.get("produit") ?? PRODUCT_NAME),
       Taille: String(fd.get("taille") ?? ""),
-      Couleur: String(fd.get("couleur") ?? ""),
       Quantité: String(fd.get("quantite") ?? "1"),
       Prix: PRODUCT_PRICE,
       Source: typeof window !== "undefined" ? window.location.href : "web",
-    });
+    };
     setStatus("sending");
+    setErrorMsg("");
+    console.log("[OrderForm] Envoi vers Apps Script:", APPS_SCRIPT_URL, payload);
     try {
-      await fetch(APPS_SCRIPT_URL, {
+      // NOTE: Apps Script /exec ne renvoie pas d'en-têtes CORS pour les requêtes JSON avec preflight.
+      // On envoie donc le JSON avec Content-Type "text/plain" (requête "simple" -> pas de preflight).
+      // Côté doPost(e) : JSON.parse(e.postData.contents).
+      const res = await fetch(APPS_SCRIPT_URL, {
         method: "POST",
-        mode: "no-cors",
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: payload.toString(),
+        redirect: "follow",
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify(payload),
       });
-      window.fbq?.("track", "Lead", { content_name: PRODUCT_NAME, value: Number(PRODUCT_PRICE) * Number(fd.get("quantite") ?? 1), currency: "USD" });
+      console.log("[OrderForm] Réponse HTTP:", res.status, res.statusText);
+      const text = await res.text();
+      console.log("[OrderForm] Corps de la réponse:", text);
+      if (!res.ok) throw new Error(`HTTP ${res.status} — ${text || res.statusText}`);
+      window.fbq?.("track", "Lead", {
+        content_name: PRODUCT_NAME,
+        value: Number(PRODUCT_PRICE) * Number(fd.get("quantite") ?? 1),
+        currency: "USD",
+      });
       setStatus("ok");
       form.reset();
       setQty(1);
-    } catch {
+    } catch (err) {
+      const message = err instanceof Error ? err.message : String(err);
+      console.error("[OrderForm] Échec envoi:", err);
+      setErrorMsg(message);
       setStatus("error");
     }
   }
@@ -87,21 +102,12 @@ function OrderForm() {
         <label className={label}>Produit</label>
         <input name="produit" readOnly defaultValue={PRODUCT_NAME} className={field} />
       </div>
-      <div className="grid grid-cols-2 gap-5">
-        <div>
-          <label className={label}>Taille</label>
-          <select name="taille" required defaultValue="" className={field}>
-            <option value="" disabled className="text-black">Choisir</option>
-            {SIZES.map((s) => <option key={s} value={s} className="text-black">{s}</option>)}
-          </select>
-        </div>
-        <div>
-          <label className={label}>Couleur</label>
-          <select name="couleur" required defaultValue="" className={field}>
-            <option value="" disabled className="text-black">Choisir</option>
-            {COLORS.map((c) => <option key={c} value={c} className="text-black">{c}</option>)}
-          </select>
-        </div>
+      <div>
+        <label className={label}>Taille</label>
+        <select name="taille" required defaultValue="" className={field}>
+          <option value="" disabled className="text-black">Choisir</option>
+          {SIZES.map((s) => <option key={s} value={s} className="text-black">{s}</option>)}
+        </select>
       </div>
       <div>
         <label className={label}>Quantité</label>
@@ -119,7 +125,11 @@ function OrderForm() {
         {status === "sending" ? "Envoi..." : "Commander maintenant"}
       </button>
       {status === "ok" && <p className="text-center text-sm text-[oklch(0.85_0.15_145)]">Merci ! Votre commande a été enregistrée. Nous vous contactons sur WhatsApp.</p>}
-      {status === "error" && <p className="text-center text-sm text-red-300">Une erreur est survenue. Réessayez.</p>}
+      {status === "error" && (
+        <p className="text-center text-sm text-red-300">
+          Erreur : {errorMsg || "Une erreur est survenue."} Réessayez.
+        </p>
+      )}
     </form>
   );
 }
@@ -162,7 +172,7 @@ function Index() {
   return (
     <div className="min-h-screen bg-background text-foreground">
       <header className="absolute top-0 left-0 right-0 z-20 flex items-center justify-between px-8 py-6 md:px-16">
-        <img src={logoAsset.url} alt="Haydar" className="h-20 md:h-28 brightness-0 invert" />
+        <img src={logoAsset.url} alt="Haydar" className="h-32 md:h-44 brightness-0 invert" />
         <nav className="hidden md:flex items-center gap-10 text-sm tracking-widest uppercase text-white/80">
           <a href="#collection" className="hover:text-white transition">Collection</a>
           <a href="#heritage" className="hover:text-white transition">Heritage</a>
@@ -258,7 +268,7 @@ function Index() {
 
       {/* CTA / CONTACT */}
       <section id="contact" className="py-24 md:py-32 px-8 md:px-16 text-white text-center" style={{ background: "var(--gradient-hero)" }}>
-        <img src={logoAsset.url} alt="Haydar" className="h-28 md:h-36 mx-auto mb-8 brightness-0 invert" />
+        <img src={logoAsset.url} alt="Haydar" className="h-44 md:h-56 mx-auto mb-8 brightness-0 invert" />
         <h2 className="font-serif text-4xl md:text-6xl max-w-3xl mx-auto mb-6 leading-tight">Wear a piece of Morocco.</h2>
         <p className="text-white/70 max-w-xl mx-auto mb-10">Limited quantities. Each vest is numbered and shipped from Fès within seven days.</p>
         <OrderForm />
