@@ -58,11 +58,18 @@ function OrderForm() {
       // NOTE: Apps Script /exec ne renvoie pas d'en-têtes CORS pour les requêtes JSON avec preflight.
       // On envoie donc le JSON avec Content-Type "text/plain" (requête "simple" -> pas de preflight).
       // Côté doPost(e) : JSON.parse(e.postData.contents).
+      // Échappe les caractères non-ASCII (é, è, ...) en \uXXXX pour éviter tout
+      // problème d'encodage UTF-8 côté Apps Script (les clés "Téléphone" et
+      // "Quantité" doivent être identiques à celles lues par data["..."]).
+      const jsonBody = JSON.stringify(payload).replace(
+        /[\u0080-\uffff]/g,
+        (c) => "\\u" + c.charCodeAt(0).toString(16).padStart(4, "0"),
+      );
       const res = await fetch(APPS_SCRIPT_URL, {
         method: "POST",
         redirect: "follow",
         headers: { "Content-Type": "text/plain;charset=utf-8" },
-        body: JSON.stringify(payload),
+        body: jsonBody,
       });
       console.log("[OrderForm] Réponse HTTP:", res.status, res.statusText);
       const text = await res.text();
