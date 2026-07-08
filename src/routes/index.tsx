@@ -37,8 +37,11 @@ function OrderForm() {
     e.preventDefault();
     const form = e.currentTarget;
     const fd = new FormData(form);
+    const now = new Date();
+    const pad = (n: number) => String(n).padStart(2, "0");
+    const formattedDate = `${pad(now.getDate())}/${pad(now.getMonth() + 1)}/${now.getFullYear()} ${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
     const payload = {
-      Date: new Date().toISOString(),
+      Date: formattedDate,
       Nom: String(fd.get("nom") ?? ""),
       Téléphone: String(fd.get("telephone") ?? ""),
       Ville: String(fd.get("ville") ?? ""),
