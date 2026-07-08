@@ -172,7 +172,7 @@ function Index() {
   return (
     <div className="min-h-screen bg-background text-foreground">
       <header className="absolute top-0 left-0 right-0 z-20 flex items-center justify-between px-8 py-6 md:px-16">
-        <img src={logoAsset.url} alt="Haydar" className="h-20 md:h-28 brightness-0 invert" />
+        <img src={logoAsset.url} alt="Haydar" className="h-32 md:h-44 brightness-0 invert" />
         <nav className="hidden md:flex items-center gap-10 text-sm tracking-widest uppercase text-white/80">
           <a href="#collection" className="hover:text-white transition">Collection</a>
           <a href="#heritage" className="hover:text-white transition">Heritage</a>
@@ -268,7 +268,7 @@ function Index() {
 
       {/* CTA / CONTACT */}
       <section id="contact" className="py-24 md:py-32 px-8 md:px-16 text-white text-center" style={{ background: "var(--gradient-hero)" }}>
-        <img src={logoAsset.url} alt="Haydar" className="h-28 md:h-36 mx-auto mb-8 brightness-0 invert" />
+        <img src={logoAsset.url} alt="Haydar" className="h-44 md:h-56 mx-auto mb-8 brightness-0 invert" />
         <h2 className="font-serif text-4xl md:text-6xl max-w-3xl mx-auto mb-6 leading-tight">Wear a piece of Morocco.</h2>
         <p className="text-white/70 max-w-xl mx-auto mb-10">Limited quantities. Each vest is numbered and shipped from Fès within seven days.</p>
         <OrderForm />
