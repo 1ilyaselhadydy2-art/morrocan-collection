@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import logoAsset from "@/assets/haydar-logo.png.asset.json";
 import heroVideo from "@/assets/haydar-hero.mp4.asset.json";
 import heroImage from "@/assets/haydar-hero.jpg.asset.json";
@@ -15,6 +15,114 @@ const gallery = [
   { src: detailImage.url, alt: "Green star and sfifa braiding detail" },
   { src: embroideryImage.url, alt: "Maroc 2026 golden trophy embroidery" },
 ];
+
+const APPS_SCRIPT_URL =
+  "https://script.google.com/macros/s/AKfycbxiAxFgpNYfW0xZS2W6UML-VE8to4xBzCvryxehoqrQHz23iB4c2jwxC9w-t0W2t33m/exec";
+const PRODUCT_NAME = "Haydar Maroc 2026 Waistcoat";
+const PRODUCT_PRICE = "189";
+const SIZES = ["S", "M", "L", "XL", "XXL"];
+const COLORS = ["Burgundy", "Green", "Black", "White"];
+
+declare global {
+  interface Window {
+    fbq?: (...args: unknown[]) => void;
+  }
+}
+
+function OrderForm() {
+  const [status, setStatus] = useState<"idle" | "sending" | "ok" | "error">("idle");
+  const [qty, setQty] = useState(1);
+
+  async function onSubmit(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    const form = e.currentTarget;
+    const fd = new FormData(form);
+    const payload = new URLSearchParams({
+      Date: new Date().toISOString(),
+      Nom: String(fd.get("nom") ?? ""),
+      Téléphone: String(fd.get("telephone") ?? ""),
+      Ville: String(fd.get("ville") ?? ""),
+      Produit: String(fd.get("produit") ?? PRODUCT_NAME),
+      Taille: String(fd.get("taille") ?? ""),
+      Couleur: String(fd.get("couleur") ?? ""),
+      Quantité: String(fd.get("quantite") ?? "1"),
+      Prix: PRODUCT_PRICE,
+      Source: typeof window !== "undefined" ? window.location.href : "web",
+    });
+    setStatus("sending");
+    try {
+      await fetch(APPS_SCRIPT_URL, {
+        method: "POST",
+        mode: "no-cors",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: payload.toString(),
+      });
+      window.fbq?.("track", "Lead", { content_name: PRODUCT_NAME, value: Number(PRODUCT_PRICE) * Number(fd.get("quantite") ?? 1), currency: "USD" });
+      setStatus("ok");
+      form.reset();
+      setQty(1);
+    } catch {
+      setStatus("error");
+    }
+  }
+
+  const field = "w-full bg-white/10 border border-white/30 px-5 py-3.5 text-sm placeholder:text-white/50 focus:outline-none focus:border-[oklch(0.72_0.14_75)] text-white";
+  const label = "text-xs tracking-[0.2em] uppercase text-white/70 mb-2 block text-left";
+
+  return (
+    <form onSubmit={onSubmit} className="max-w-xl mx-auto grid gap-5 text-left">
+      <div>
+        <label className={label}>Nom complet</label>
+        <input name="nom" required className={field} placeholder="Votre nom" />
+      </div>
+      <div>
+        <label className={label}>Téléphone (WhatsApp)</label>
+        <input name="telephone" required type="tel" inputMode="tel" className={field} placeholder="+212 6 00 00 00 00" />
+      </div>
+      <div>
+        <label className={label}>Ville</label>
+        <input name="ville" required className={field} placeholder="Casablanca" />
+      </div>
+      <div>
+        <label className={label}>Produit</label>
+        <input name="produit" readOnly defaultValue={PRODUCT_NAME} className={field} />
+      </div>
+      <div className="grid grid-cols-2 gap-5">
+        <div>
+          <label className={label}>Taille</label>
+          <select name="taille" required defaultValue="" className={field}>
+            <option value="" disabled className="text-black">Choisir</option>
+            {SIZES.map((s) => <option key={s} value={s} className="text-black">{s}</option>)}
+          </select>
+        </div>
+        <div>
+          <label className={label}>Couleur</label>
+          <select name="couleur" required defaultValue="" className={field}>
+            <option value="" disabled className="text-black">Choisir</option>
+            {COLORS.map((c) => <option key={c} value={c} className="text-black">{c}</option>)}
+          </select>
+        </div>
+      </div>
+      <div>
+        <label className={label}>Quantité</label>
+        <div className="flex items-center gap-3">
+          <button type="button" onClick={() => setQty((q) => Math.max(1, q - 1))} className="w-12 h-12 border border-white/30 text-white text-lg hover:bg-white/10">−</button>
+          <input name="quantite" type="number" min={1} value={qty} onChange={(e) => setQty(Math.max(1, Number(e.target.value) || 1))} className={`${field} text-center flex-1`} />
+          <button type="button" onClick={() => setQty((q) => q + 1)} className="w-12 h-12 border border-white/30 text-white text-lg hover:bg-white/10">+</button>
+        </div>
+      </div>
+      <button
+        type="submit"
+        disabled={status === "sending"}
+        className="bg-[oklch(0.72_0.14_75)] text-[oklch(0.22_0.03_40)] px-8 py-4 text-sm tracking-widest uppercase hover:bg-white transition font-medium disabled:opacity-60"
+      >
+        {status === "sending" ? "Envoi..." : "Commander maintenant"}
+      </button>
+      {status === "ok" && <p className="text-center text-sm text-[oklch(0.85_0.15_145)]">Merci ! Votre commande a été enregistrée. Nous vous contactons sur WhatsApp.</p>}
+      {status === "error" && <p className="text-center text-sm text-red-300">Une erreur est survenue. Réessayez.</p>}
+    </form>
+  );
+}
 
 function AutoCarousel() {
   const [i, setI] = useState(0);
@@ -153,10 +261,7 @@ function Index() {
         <img src={logoAsset.url} alt="Haydar" className="h-28 md:h-36 mx-auto mb-8 brightness-0 invert" />
         <h2 className="font-serif text-4xl md:text-6xl max-w-3xl mx-auto mb-6 leading-tight">Wear a piece of Morocco.</h2>
         <p className="text-white/70 max-w-xl mx-auto mb-10">Limited quantities. Each vest is numbered and shipped from Fès within seven days.</p>
-        <form className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
-          <input type="email" required placeholder="your@email.com" className="flex-1 bg-white/10 border border-white/30 px-5 py-4 text-sm placeholder:text-white/50 focus:outline-none focus:border-[oklch(0.72_0.14_75)]" />
-          <button type="submit" className="bg-[oklch(0.72_0.14_75)] text-[oklch(0.22_0.03_40)] px-8 py-4 text-sm tracking-widest uppercase hover:bg-white transition font-medium">Reserve</button>
-        </form>
+        <OrderForm />
       </section>
 
       <footer className="py-10 px-8 md:px-16 bg-[oklch(0.22_0.03_40)] text-white/60 text-xs tracking-widest uppercase flex flex-col md:flex-row justify-between gap-4">
