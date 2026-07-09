@@ -17,7 +17,7 @@ const gallery = [
 ];
 
 const APPS_SCRIPT_URL =
-  "https://script.google.com/macros/s/AKfycbxiAxFgpNYfW0xZS2W6UML-VE8to4xBzCvryxehoqrQHz23iB4c2jwxC9w-t0W2t33m/exec";
+  "https://script.google.com/macros/s/AKfycbx8j6jt7jrFrvAJnrOGh8S3UN12JkHow-XrMzeDa7TRWG1TiIWDlbHpFed91qVOcW8f/exec";
 const PRODUCT_NAME = "Haydar Maroc 2026 Waistcoat";
 const PRODUCT_PRICE = "189";
 const SIZES = ["S", "M", "L", "XL", "XXL"];
@@ -37,39 +37,25 @@ function OrderForm() {
     e.preventDefault();
     const form = e.currentTarget;
     const fd = new FormData(form);
-    const now = new Date();
-    const pad = (n: number) => String(n).padStart(2, "0");
-    const formattedDate = `${pad(now.getDate())}/${pad(now.getMonth() + 1)}/${now.getFullYear()} ${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
     const payload = {
-      Date: formattedDate,
-      Nom: String(fd.get("nom") ?? ""),
-      Téléphone: String(fd.get("telephone") ?? ""),
-      Ville: String(fd.get("ville") ?? ""),
-      Produit: String(fd.get("produit") ?? PRODUCT_NAME),
-      Taille: String(fd.get("taille") ?? ""),
-      Quantité: String(fd.get("quantite") ?? "1"),
-      Prix: PRODUCT_PRICE,
-      Source: typeof window !== "undefined" ? window.location.href : "web",
+      nom: String(fd.get("nom") ?? ""),
+      telephone: String(fd.get("telephone") ?? ""),
+      ville: String(fd.get("ville") ?? ""),
+      produit: PRODUCT_NAME,
+      taille: String(fd.get("taille") ?? ""),
+      quantite: Number(fd.get("quantite") ?? 1),
+      prix: PRODUCT_PRICE,
+      source: typeof window !== "undefined" ? window.location.href : "web",
     };
     setStatus("sending");
     setErrorMsg("");
     console.log("[OrderForm] Envoi vers Apps Script:", APPS_SCRIPT_URL, payload);
     try {
-      // NOTE: Apps Script /exec ne renvoie pas d'en-têtes CORS pour les requêtes JSON avec preflight.
-      // On envoie donc le JSON avec Content-Type "text/plain" (requête "simple" -> pas de preflight).
-      // Côté doPost(e) : JSON.parse(e.postData.contents).
-      // Échappe les caractères non-ASCII (é, è, ...) en \uXXXX pour éviter tout
-      // problème d'encodage UTF-8 côté Apps Script (les clés "Téléphone" et
-      // "Quantité" doivent être identiques à celles lues par data["..."]).
-      const jsonBody = JSON.stringify(payload).replace(
-        /[\u0080-\uffff]/g,
-        (c) => "\\u" + c.charCodeAt(0).toString(16).padStart(4, "0"),
-      );
       const res = await fetch(APPS_SCRIPT_URL, {
         method: "POST",
         redirect: "follow",
         headers: { "Content-Type": "text/plain;charset=utf-8" },
-        body: jsonBody,
+        body: JSON.stringify(payload),
       });
       console.log("[OrderForm] Réponse HTTP:", res.status, res.statusText);
       const text = await res.text();
