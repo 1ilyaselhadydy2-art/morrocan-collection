@@ -19,9 +19,11 @@ const gallery = [
 
 const APPS_SCRIPT_URL =
   "https://script.google.com/macros/s/AKfycbx8j6jt7jrFrvAJnrOGh8S3UN12JkHow-XrMzeDa7TRWG1TiIWDlbHpFed91qVOcW8f/exec";
+const PRICING_API_URL =
+  "https://script.google.com/macros/s/AKfycbxhUAKirKRXKUSP2YHV4oDCo2062BfLz1vEnC9JGoJkOz8ATHJiDmPAwZPPRtzW4S3rvg/exec";
 const PRODUCT_NAME = "Haydar Maroc 2026 Waistcoat";
-const PRODUCT_PRICE = "69";
-const PRODUCT_PRICE_ORIGINAL = "189";
+const DEFAULT_PRICE = "69";
+const DEFAULT_PRICE_ORIGINAL = "189";
 const SIZES = ["S", "M", "L", "XL", "XXL"];
 
 declare global {
@@ -151,7 +153,7 @@ const T = {
   },
 } as const;
 
-function OrderForm({ lang }: { lang: Lang }) {
+function OrderForm({ lang, price, available, soldOutLabel }: { lang: Lang; price: string; available: boolean; soldOutLabel: string }) {
   const t = T[lang].form;
   const [status, setStatus] = useState<"idle" | "sending" | "ok" | "error">("idle");
   const [errorMsg, setErrorMsg] = useState<string>("");
@@ -168,7 +170,7 @@ function OrderForm({ lang }: { lang: Lang }) {
       produit: PRODUCT_NAME,
       taille: String(fd.get("taille") ?? ""),
       quantite: Number(fd.get("quantite") ?? 1),
-      prix: PRODUCT_PRICE,
+      prix: price,
       source: typeof window !== "undefined" ? window.location.href : "web",
     };
     setStatus("sending");
@@ -187,7 +189,7 @@ function OrderForm({ lang }: { lang: Lang }) {
       if (!res.ok) throw new Error(`HTTP ${res.status} — ${text || res.statusText}`);
       window.fbq?.("track", "Lead", {
         content_name: PRODUCT_NAME,
-        value: Number(PRODUCT_PRICE) * Number(fd.get("quantite") ?? 1),
+        value: Number(price) * Number(fd.get("quantite") ?? 1),
         currency: "USD",
       });
       setStatus("ok");
@@ -239,10 +241,10 @@ function OrderForm({ lang }: { lang: Lang }) {
       </div>
       <button
         type="submit"
-        disabled={status === "sending"}
+        disabled={status === "sending" || !available}
         className="bg-[oklch(0.72_0.14_75)] text-[oklch(0.22_0.03_40)] px-8 py-4 text-sm tracking-widest uppercase hover:bg-white transition font-medium disabled:opacity-60"
       >
-        {status === "sending" ? t.sending : t.submit}
+        {!available ? soldOutLabel : status === "sending" ? t.sending : t.submit}
       </button>
       {status === "ok" && <p className="text-center text-sm text-[oklch(0.85_0.15_145)]">{t.ok}</p>}
       {status === "error" && (
@@ -291,6 +293,38 @@ function AutoCarousel() {
 function Index() {
   const [lang, setLang] = useState<Lang>("en");
   const t = T[lang];
+  const [price, setPrice] = useState<string>(DEFAULT_PRICE);
+  const [originalPrice, setOriginalPrice] = useState<string>(DEFAULT_PRICE_ORIGINAL);
+  const [available, setAvailable] = useState<boolean>(true);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await fetch(`${PRICING_API_URL}?t=${Date.now()}`, {
+          method: "GET",
+          redirect: "follow",
+          cache: "no-store",
+        });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json();
+        if (cancelled) return;
+        const cur = data.Prix ?? data.prix ?? data.price ?? data.PrixActuel;
+        const old = data.AncienPrix ?? data.ancienPrix ?? data.oldPrice ?? data.PrixBarre;
+        const disp = data.Disponible ?? data.disponible ?? data.available;
+        if (cur !== undefined && cur !== null && String(cur).trim() !== "") setPrice(String(cur).replace(/[^\d.]/g, "") || String(cur));
+        if (old !== undefined && old !== null && String(old).trim() !== "") setOriginalPrice(String(old).replace(/[^\d.]/g, "") || String(old));
+        if (disp !== undefined && disp !== null) setAvailable(String(disp).toLowerCase() !== "non");
+      } catch (err) {
+        console.error("[Pricing] Fetch failed:", err);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const soldOutLabel = lang === "fr" ? "Rupture de stock" : "Sold out";
 
   useEffect(() => {
     if (typeof document !== "undefined") {
@@ -395,11 +429,15 @@ function Index() {
               ))}
             </dl>
             <div className="flex items-baseline gap-4 mb-6 flex-wrap">
-              <span className="font-serif text-5xl sm:text-6xl md:text-7xl font-bold text-[oklch(0.38_0.14_20)]">${PRODUCT_PRICE}</span>
-              <span className="font-serif text-2xl text-muted-foreground line-through">${PRODUCT_PRICE_ORIGINAL}</span>
+              <span className="font-serif text-5xl sm:text-6xl md:text-7xl font-bold text-[oklch(0.38_0.14_20)]">${price}</span>
+              <span className="font-serif text-2xl text-muted-foreground line-through">${originalPrice}</span>
               <span className="text-sm text-muted-foreground w-full md:w-auto">{t.product.shipping}</span>
             </div>
-            <a href="#contact" className="inline-block bg-[oklch(0.38_0.14_20)] text-white px-10 py-4 min-h-[48px] text-sm tracking-widest uppercase hover:bg-[oklch(0.28_0.10_25)] transition" style={{ boxShadow: "var(--shadow-elegant)" }}>{t.product.reserve}</a>
+            {available ? (
+              <a href="#contact" className="inline-block bg-[oklch(0.38_0.14_20)] text-white px-10 py-4 min-h-[48px] text-sm tracking-widest uppercase hover:bg-[oklch(0.28_0.10_25)] transition" style={{ boxShadow: "var(--shadow-elegant)" }}>{t.product.reserve}</a>
+            ) : (
+              <button type="button" disabled className="inline-block bg-[oklch(0.38_0.14_20)] text-white px-10 py-4 min-h-[48px] text-sm tracking-widest uppercase opacity-60 cursor-not-allowed">{soldOutLabel}</button>
+            )}
           </div>
           <div className="order-1 md:order-2">
             <AutoCarousel />
@@ -432,7 +470,7 @@ function Index() {
         <img src={logoAsset.url} alt="Haydar" className="h-32 sm:h-40 md:h-56 mx-auto mb-6 md:mb-8 brightness-0 invert" />
         <h2 className="font-serif text-3xl sm:text-4xl md:text-6xl max-w-3xl mx-auto mb-4 md:mb-6 leading-tight">{t.cta.title}</h2>
         <p className="text-white/70 max-w-xl mx-auto mb-8 md:mb-10">{t.cta.desc}</p>
-        <OrderForm lang={lang} />
+        <OrderForm lang={lang} price={price} available={available} soldOutLabel={soldOutLabel} />
       </section>
 
       <footer className="py-8 md:py-10 px-6 sm:px-8 md:px-16 bg-[oklch(0.22_0.03_40)] text-white/60 text-xs tracking-widest uppercase flex flex-col md:flex-row justify-between gap-3 md:gap-4 text-center md:text-left">
