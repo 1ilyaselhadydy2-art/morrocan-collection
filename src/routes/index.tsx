@@ -153,7 +153,7 @@ const T = {
   },
 } as const;
 
-function OrderForm({ lang }: { lang: Lang }) {
+function OrderForm({ lang, price, available, soldOutLabel }: { lang: Lang; price: string; available: boolean; soldOutLabel: string }) {
   const t = T[lang].form;
   const [status, setStatus] = useState<"idle" | "sending" | "ok" | "error">("idle");
   const [errorMsg, setErrorMsg] = useState<string>("");
@@ -170,7 +170,7 @@ function OrderForm({ lang }: { lang: Lang }) {
       produit: PRODUCT_NAME,
       taille: String(fd.get("taille") ?? ""),
       quantite: Number(fd.get("quantite") ?? 1),
-      prix: PRODUCT_PRICE,
+      prix: price,
       source: typeof window !== "undefined" ? window.location.href : "web",
     };
     setStatus("sending");
@@ -189,7 +189,7 @@ function OrderForm({ lang }: { lang: Lang }) {
       if (!res.ok) throw new Error(`HTTP ${res.status} — ${text || res.statusText}`);
       window.fbq?.("track", "Lead", {
         content_name: PRODUCT_NAME,
-        value: Number(PRODUCT_PRICE) * Number(fd.get("quantite") ?? 1),
+        value: Number(price) * Number(fd.get("quantite") ?? 1),
         currency: "USD",
       });
       setStatus("ok");
@@ -241,10 +241,10 @@ function OrderForm({ lang }: { lang: Lang }) {
       </div>
       <button
         type="submit"
-        disabled={status === "sending"}
+        disabled={status === "sending" || !available}
         className="bg-[oklch(0.72_0.14_75)] text-[oklch(0.22_0.03_40)] px-8 py-4 text-sm tracking-widest uppercase hover:bg-white transition font-medium disabled:opacity-60"
       >
-        {status === "sending" ? t.sending : t.submit}
+        {!available ? soldOutLabel : status === "sending" ? t.sending : t.submit}
       </button>
       {status === "ok" && <p className="text-center text-sm text-[oklch(0.85_0.15_145)]">{t.ok}</p>}
       {status === "error" && (
