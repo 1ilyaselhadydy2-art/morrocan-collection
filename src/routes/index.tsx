@@ -293,6 +293,38 @@ function AutoCarousel() {
 function Index() {
   const [lang, setLang] = useState<Lang>("en");
   const t = T[lang];
+  const [price, setPrice] = useState<string>(DEFAULT_PRICE);
+  const [originalPrice, setOriginalPrice] = useState<string>(DEFAULT_PRICE_ORIGINAL);
+  const [available, setAvailable] = useState<boolean>(true);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await fetch(`${PRICING_API_URL}?t=${Date.now()}`, {
+          method: "GET",
+          redirect: "follow",
+          cache: "no-store",
+        });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json();
+        if (cancelled) return;
+        const cur = data.Prix ?? data.prix ?? data.price ?? data.PrixActuel;
+        const old = data.AncienPrix ?? data.ancienPrix ?? data.oldPrice ?? data.PrixBarre;
+        const disp = data.Disponible ?? data.disponible ?? data.available;
+        if (cur !== undefined && cur !== null && String(cur).trim() !== "") setPrice(String(cur).replace(/[^\d.]/g, "") || String(cur));
+        if (old !== undefined && old !== null && String(old).trim() !== "") setOriginalPrice(String(old).replace(/[^\d.]/g, "") || String(old));
+        if (disp !== undefined && disp !== null) setAvailable(String(disp).toLowerCase() !== "non");
+      } catch (err) {
+        console.error("[Pricing] Fetch failed:", err);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const soldOutLabel = lang === "fr" ? "Rupture de stock" : "Sold out";
 
   useEffect(() => {
     if (typeof document !== "undefined") {
@@ -397,11 +429,15 @@ function Index() {
               ))}
             </dl>
             <div className="flex items-baseline gap-4 mb-6 flex-wrap">
-              <span className="font-serif text-5xl sm:text-6xl md:text-7xl font-bold text-[oklch(0.38_0.14_20)]">${PRODUCT_PRICE}</span>
-              <span className="font-serif text-2xl text-muted-foreground line-through">${PRODUCT_PRICE_ORIGINAL}</span>
+              <span className="font-serif text-5xl sm:text-6xl md:text-7xl font-bold text-[oklch(0.38_0.14_20)]">${price}</span>
+              <span className="font-serif text-2xl text-muted-foreground line-through">${originalPrice}</span>
               <span className="text-sm text-muted-foreground w-full md:w-auto">{t.product.shipping}</span>
             </div>
-            <a href="#contact" className="inline-block bg-[oklch(0.38_0.14_20)] text-white px-10 py-4 min-h-[48px] text-sm tracking-widest uppercase hover:bg-[oklch(0.28_0.10_25)] transition" style={{ boxShadow: "var(--shadow-elegant)" }}>{t.product.reserve}</a>
+            {available ? (
+              <a href="#contact" className="inline-block bg-[oklch(0.38_0.14_20)] text-white px-10 py-4 min-h-[48px] text-sm tracking-widest uppercase hover:bg-[oklch(0.28_0.10_25)] transition" style={{ boxShadow: "var(--shadow-elegant)" }}>{t.product.reserve}</a>
+            ) : (
+              <button type="button" disabled className="inline-block bg-[oklch(0.38_0.14_20)] text-white px-10 py-4 min-h-[48px] text-sm tracking-widest uppercase opacity-60 cursor-not-allowed">{soldOutLabel}</button>
+            )}
           </div>
           <div className="order-1 md:order-2">
             <AutoCarousel />
