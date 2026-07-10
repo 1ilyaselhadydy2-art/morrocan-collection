@@ -300,30 +300,43 @@ function Index() {
 
   return (
     <div className="min-h-screen bg-background text-foreground">
-      <header className="absolute top-0 left-0 right-0 z-20 flex items-center justify-between px-8 py-6 md:px-16">
-        <img src={logoAsset.url} alt="Haydar" className="h-32 md:h-44 brightness-0 invert" />
+      <header className="absolute top-0 left-0 right-0 z-30 flex items-center justify-between px-4 sm:px-6 md:px-16 py-3 md:py-6 gap-2">
+        <img src={logoAsset.url} alt="Haydar" className="h-20 sm:h-28 md:h-44 brightness-0 invert" />
         <nav className="hidden md:flex items-center gap-10 text-sm tracking-widest uppercase text-white/80">
           <a href="#collection" className="hover:text-white transition">{t.nav.collection}</a>
           <a href="#heritage" className="hover:text-white transition">{t.nav.heritage}</a>
           <a href="#contact" className="hover:text-white transition">{t.nav.contact}</a>
         </nav>
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-3 md:gap-4">
           <div className="flex items-center text-xs tracking-[0.2em] uppercase text-white/80">
-            <button onClick={() => setLang("fr")} aria-label="Français" className={`px-2 py-1 transition ${lang === "fr" ? "text-white font-medium" : "text-white/50 hover:text-white"}`}>FR</button>
+            <button onClick={() => setLang("fr")} aria-label="Français" className={`px-2 py-2 min-h-[44px] transition ${lang === "fr" ? "text-white font-medium" : "text-white/50 hover:text-white"}`}>FR</button>
             <span className="text-white/30">|</span>
-            <button onClick={() => setLang("en")} aria-label="English" className={`px-2 py-1 transition ${lang === "en" ? "text-white font-medium" : "text-white/50 hover:text-white"}`}>EN</button>
+            <button onClick={() => setLang("en")} aria-label="English" className={`px-2 py-2 min-h-[44px] transition ${lang === "en" ? "text-white font-medium" : "text-white/50 hover:text-white"}`}>EN</button>
           </div>
           <a href="#collection" className="hidden md:inline-flex text-xs tracking-[0.2em] uppercase text-white border border-white/40 px-5 py-2.5 hover:bg-white hover:text-[oklch(0.38_0.14_20)] transition">{t.nav.shop}</a>
         </div>
       </header>
 
       {/* HERO */}
-      <section className="relative min-h-screen grid md:grid-cols-2" style={{ background: "var(--gradient-hero)" }}>
-        <div className="flex flex-col justify-center px-8 md:px-16 py-32 text-white relative z-10">
+      <section className="relative min-h-screen md:grid md:grid-cols-2" style={{ background: "var(--gradient-hero)" }}>
+        {/* Mobile: full-bleed video background */}
+        <div className="md:hidden absolute inset-0 z-0">
+          <video
+            src={heroVideo.url}
+            autoPlay
+            muted
+            loop
+            playsInline
+            preload="metadata"
+            className="absolute inset-0 w-full h-full object-cover"
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-[oklch(0.22_0.03_40)]/70 via-[oklch(0.22_0.03_40)]/55 to-[oklch(0.22_0.03_40)]/85" />
+        </div>
+        <div className="flex flex-col justify-center px-6 sm:px-8 md:px-16 pt-32 pb-20 md:py-32 text-white relative z-10 min-h-screen md:min-h-0">
           {/* Moroccan fabric texture overlay — left side only, fades toward center */}
           <div
             aria-hidden="true"
-            className="pointer-events-none absolute inset-0 -z-0"
+            className="pointer-events-none absolute inset-0 -z-0 hidden md:block"
             style={{
               backgroundImage: `url(${fabricTexture})`,
               backgroundSize: "cover",
@@ -333,30 +346,31 @@ function Index() {
               maskImage: "linear-gradient(to right, black 0%, black 45%, transparent 95%)",
             }}
           />
-          <div className="relative z-10">
-            <span className="text-xs tracking-[0.4em] uppercase text-fabric mb-6 block">{t.hero.eyebrow}</span>
-            <h1 className="font-serif text-5xl md:text-7xl leading-[1.05] mb-8">
+          <div className="relative z-10 text-center md:text-left">
+            <span className="text-[10px] sm:text-xs tracking-[0.3em] sm:tracking-[0.4em] uppercase text-fabric mb-5 md:mb-6 block">{t.hero.eyebrow}</span>
+            <h1 className="font-serif text-[2.5rem] leading-[1.1] sm:text-5xl md:text-7xl md:leading-[1.05] mb-6 md:mb-8">
               {t.hero.title1}<br/>{t.hero.title2}<em className="text-fabric not-italic">{t.hero.titleEm}</em>
             </h1>
-            <p className="text-lg text-white/80 max-w-md mb-10 leading-relaxed">
+            <p className="text-base md:text-lg text-white/85 max-w-md mx-auto md:mx-0 mb-8 md:mb-10 leading-relaxed">
               {t.hero.desc}
             </p>
-            <div className="flex flex-wrap gap-4">
-              <a href="#collection" className="bg-[oklch(0.72_0.14_75)] text-[oklch(0.22_0.03_40)] px-8 py-4 text-sm tracking-widest uppercase hover:bg-white transition font-medium">{t.hero.cta1}</a>
-              <a href="#heritage" className="border border-white/50 text-white px-8 py-4 text-sm tracking-widest uppercase hover:bg-white/10 transition">{t.hero.cta2}</a>
+            <div className="flex flex-col sm:flex-row flex-wrap gap-3 sm:gap-4 justify-center md:justify-start">
+              <a href="#contact" className="bg-[oklch(0.72_0.14_75)] text-[oklch(0.22_0.03_40)] px-8 py-4 min-h-[48px] text-sm tracking-widest uppercase hover:bg-white transition font-medium text-center">{t.hero.cta1}</a>
+              <a href="#heritage" className="border border-white/50 text-white px-8 py-4 min-h-[48px] text-sm tracking-widest uppercase hover:bg-white/10 transition text-center">{t.hero.cta2}</a>
             </div>
-            <div className="flex items-center gap-8 mt-16 text-xs tracking-widest uppercase text-white/60">
+            <div className="flex items-center justify-center md:justify-start gap-4 sm:gap-8 mt-10 md:mt-16 text-[10px] sm:text-xs tracking-widest uppercase text-white/70">
               <span>{t.hero.tags[0]}</span><span className="w-px h-4 bg-white/30" /><span>{t.hero.tags[1]}</span><span className="w-px h-4 bg-white/30" /><span>{t.hero.tags[2]}</span>
             </div>
           </div>
         </div>
-        <div className="relative min-h-[60vh] md:min-h-screen">
+        <div className="relative hidden md:block md:min-h-screen">
           <video
             src={heroVideo.url}
             autoPlay
             muted
             loop
             playsInline
+            preload="metadata"
             className="absolute inset-0 w-full h-full object-cover"
           />
           <div className="absolute inset-0 bg-gradient-to-r from-[oklch(0.38_0.14_20)] via-transparent to-transparent md:from-[oklch(0.38_0.14_20)]/60" />
@@ -367,11 +381,11 @@ function Index() {
       </section>
 
       {/* PRODUCT DETAIL */}
-      <section id="collection" className="py-24 md:py-32 px-8 md:px-16 bg-background">
+      <section id="collection" className="py-16 md:py-32 px-6 sm:px-8 md:px-16 bg-background">
         <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-16 items-center">
           <div className="order-2 md:order-1">
             <span className="text-xs tracking-[0.3em] uppercase text-[oklch(0.55_0.16_40)] mb-4 block">{t.product.eyebrow}</span>
-            <h2 className="font-serif text-4xl md:text-5xl mb-6 leading-tight">{t.product.title}</h2>
+            <h2 className="font-serif text-3xl sm:text-4xl md:text-5xl mb-6 leading-tight">{t.product.title}</h2>
             <p className="text-muted-foreground leading-relaxed mb-8">
               {t.product.desc}
             </p>
@@ -381,11 +395,11 @@ function Index() {
               ))}
             </dl>
             <div className="flex items-baseline gap-4 mb-6 flex-wrap">
-              <span className="font-serif text-6xl md:text-7xl font-bold text-[oklch(0.38_0.14_20)]">${PRODUCT_PRICE}</span>
+              <span className="font-serif text-5xl sm:text-6xl md:text-7xl font-bold text-[oklch(0.38_0.14_20)]">${PRODUCT_PRICE}</span>
               <span className="font-serif text-2xl text-muted-foreground line-through">${PRODUCT_PRICE_ORIGINAL}</span>
               <span className="text-sm text-muted-foreground w-full md:w-auto">{t.product.shipping}</span>
             </div>
-            <a href="#contact" className="inline-block bg-[oklch(0.38_0.14_20)] text-white px-10 py-4 text-sm tracking-widest uppercase hover:bg-[oklch(0.28_0.10_25)] transition" style={{ boxShadow: "var(--shadow-elegant)" }}>{t.product.reserve}</a>
+            <a href="#contact" className="inline-block bg-[oklch(0.38_0.14_20)] text-white px-10 py-4 min-h-[48px] text-sm tracking-widest uppercase hover:bg-[oklch(0.28_0.10_25)] transition" style={{ boxShadow: "var(--shadow-elegant)" }}>{t.product.reserve}</a>
           </div>
           <div className="order-1 md:order-2">
             <AutoCarousel />
@@ -394,14 +408,14 @@ function Index() {
       </section>
 
       {/* HERITAGE */}
-      <section id="heritage" className="py-24 md:py-32 px-8 md:px-16 bg-[oklch(0.94_0.02_75)]">
+      <section id="heritage" className="py-16 md:py-32 px-6 sm:px-8 md:px-16 bg-[oklch(0.94_0.02_75)]">
         <div className="max-w-5xl mx-auto text-center">
           <span className="text-xs tracking-[0.3em] uppercase text-[oklch(0.55_0.16_40)] mb-4 block">{t.heritage.eyebrow}</span>
-          <h2 className="font-serif text-4xl md:text-5xl mb-8 leading-tight">{t.heritage.title}</h2>
-          <p className="text-lg text-muted-foreground leading-relaxed max-w-2xl mx-auto mb-16">
+          <h2 className="font-serif text-3xl sm:text-4xl md:text-5xl mb-6 md:mb-8 leading-tight">{t.heritage.title}</h2>
+          <p className="text-base md:text-lg text-muted-foreground leading-relaxed max-w-2xl mx-auto mb-12 md:mb-16">
             {t.heritage.desc}
           </p>
-          <div className="grid md:grid-cols-3 gap-12 text-left">
+          <div className="grid md:grid-cols-3 gap-10 md:gap-12 text-left">
             {t.heritage.steps.map((s) => (
               <div key={s.n} className="border-t border-[oklch(0.72_0.14_75)] pt-6">
                 <span className="text-[oklch(0.72_0.14_75)] font-serif text-2xl">{s.n}</span>
@@ -414,14 +428,14 @@ function Index() {
       </section>
 
       {/* CTA / CONTACT */}
-      <section id="contact" className="py-24 md:py-32 px-8 md:px-16 text-white text-center" style={{ background: "var(--gradient-hero)" }}>
-        <img src={logoAsset.url} alt="Haydar" className="h-44 md:h-56 mx-auto mb-8 brightness-0 invert" />
-        <h2 className="font-serif text-4xl md:text-6xl max-w-3xl mx-auto mb-6 leading-tight">{t.cta.title}</h2>
-        <p className="text-white/70 max-w-xl mx-auto mb-10">{t.cta.desc}</p>
+      <section id="contact" className="py-16 md:py-32 px-6 sm:px-8 md:px-16 text-white text-center" style={{ background: "var(--gradient-hero)" }}>
+        <img src={logoAsset.url} alt="Haydar" className="h-32 sm:h-40 md:h-56 mx-auto mb-6 md:mb-8 brightness-0 invert" />
+        <h2 className="font-serif text-3xl sm:text-4xl md:text-6xl max-w-3xl mx-auto mb-4 md:mb-6 leading-tight">{t.cta.title}</h2>
+        <p className="text-white/70 max-w-xl mx-auto mb-8 md:mb-10">{t.cta.desc}</p>
         <OrderForm lang={lang} />
       </section>
 
-      <footer className="py-10 px-8 md:px-16 bg-[oklch(0.22_0.03_40)] text-white/60 text-xs tracking-widest uppercase flex flex-col md:flex-row justify-between gap-4">
+      <footer className="py-8 md:py-10 px-6 sm:px-8 md:px-16 bg-[oklch(0.22_0.03_40)] text-white/60 text-xs tracking-widest uppercase flex flex-col md:flex-row justify-between gap-3 md:gap-4 text-center md:text-left">
         <span>{t.footer.left}</span>
         <span>{t.footer.right}</span>
       </footer>
