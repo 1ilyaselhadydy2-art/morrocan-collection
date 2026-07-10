@@ -470,7 +470,7 @@ function Index() {
         <img src={logoAsset.url} alt="Haydar" className="h-32 sm:h-40 md:h-56 mx-auto mb-6 md:mb-8 brightness-0 invert" />
         <h2 className="font-serif text-3xl sm:text-4xl md:text-6xl max-w-3xl mx-auto mb-4 md:mb-6 leading-tight">{t.cta.title}</h2>
         <p className="text-white/70 max-w-xl mx-auto mb-8 md:mb-10">{t.cta.desc}</p>
-        <OrderForm lang={lang} />
+        <OrderForm lang={lang} price={price} available={available} soldOutLabel={soldOutLabel} />
       </section>
 
       <footer className="py-8 md:py-10 px-6 sm:px-8 md:px-16 bg-[oklch(0.22_0.03_40)] text-white/60 text-xs tracking-widest uppercase flex flex-col md:flex-row justify-between gap-3 md:gap-4 text-center md:text-left">
