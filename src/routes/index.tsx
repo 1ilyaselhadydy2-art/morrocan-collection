@@ -19,9 +19,11 @@ const gallery = [
 
 const APPS_SCRIPT_URL =
   "https://script.google.com/macros/s/AKfycbx8j6jt7jrFrvAJnrOGh8S3UN12JkHow-XrMzeDa7TRWG1TiIWDlbHpFed91qVOcW8f/exec";
+const PRICING_API_URL =
+  "https://script.google.com/macros/s/AKfycbxhUAKirKRXKUSP2YHV4oDCo2062BfLz1vEnC9JGoJkOz8ATHJiDmPAwZPPRtzW4S3rvg/exec";
 const PRODUCT_NAME = "Haydar Maroc 2026 Waistcoat";
-const PRODUCT_PRICE = "69";
-const PRODUCT_PRICE_ORIGINAL = "189";
+const DEFAULT_PRICE = "69";
+const DEFAULT_PRICE_ORIGINAL = "189";
 const SIZES = ["S", "M", "L", "XL", "XXL"];
 
 declare global {
