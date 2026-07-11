@@ -477,6 +477,8 @@ function Index() {
         <span>{t.footer.left}</span>
         <span>{t.footer.right}</span>
       </footer>
+
+      <SiteFooter lang={lang} />
     </div>
   );
 }
