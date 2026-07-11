@@ -1,6 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState, type FormEvent } from "react";
+import { Link } from "@tanstack/react-router";
 import { Instagram, Facebook, Linkedin, Mail, Phone, MessageCircle, MapPin } from "lucide-react";
+import { PromoPopup } from "@/components/promo-popup";
 import logoAsset from "@/assets/haydar-logo.png.asset.json";
 import heroVideo from "@/assets/haydar-hero.mp4.asset.json";
 import heroImage from "@/assets/haydar-hero.jpg.asset.json";
@@ -475,6 +477,7 @@ function Index() {
       </section>
 
       <SiteFooter lang={lang} />
+      <PromoPopup />
     </div>
   );
 }
@@ -595,10 +598,10 @@ function SiteFooter({ lang }: { lang: Lang }) {
           <div>
             <h4 className="font-serif text-lg text-white mb-5">{L.service}</h4>
             <ul className="space-y-3 text-sm">
-              <li><a href="#contact" className={linkCls}>{L.support}</a></li>
-              <li><a href="#contact" className={linkCls}>{L.track}</a></li>
-              <li><a href="#contact" className={linkCls}>{L.sizes}</a></li>
-              <li><a href="#contact" className={linkCls}>{L.faq}</a></li>
+              <li><Link to="/contact" className={linkCls}>{L.support}</Link></li>
+              <li><Link to="/track" className={linkCls}>{L.track}</Link></li>
+              <li><Link to="/size-guide" className={linkCls}>{L.sizes}</Link></li>
+              <li><Link to="/faq" className={linkCls}>{L.faq}</Link></li>
             </ul>
           </div>
 
@@ -606,10 +609,10 @@ function SiteFooter({ lang }: { lang: Lang }) {
           <div>
             <h4 className="font-serif text-lg text-white mb-5">{L.legal}</h4>
             <ul className="space-y-3 text-sm">
-              <li><a href="#" className={linkCls}>{L.privacy}</a></li>
-              <li><a href="#" className={linkCls}>{L.terms}</a></li>
-              <li><a href="#" className={linkCls}>{L.shipping}</a></li>
-              <li><a href="#" className={linkCls}>{L.returns}</a></li>
+              <li><Link to="/privacy" className={linkCls}>{L.privacy}</Link></li>
+              <li><Link to="/terms" className={linkCls}>{L.terms}</Link></li>
+              <li><Link to="/shipping" className={linkCls}>{L.shipping}</Link></li>
+              <li><Link to="/returns" className={linkCls}>{L.returns}</Link></li>
             </ul>
           </div>
         </div>
