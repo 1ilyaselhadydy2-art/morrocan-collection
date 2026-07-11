@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState, type FormEvent } from "react";
+import { Instagram, Facebook, Linkedin, Mail, Phone, MessageCircle, MapPin } from "lucide-react";
 import logoAsset from "@/assets/haydar-logo.png.asset.json";
 import heroVideo from "@/assets/haydar-hero.mp4.asset.json";
 import heroImage from "@/assets/haydar-hero.jpg.asset.json";
