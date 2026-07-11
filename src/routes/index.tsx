@@ -474,12 +474,151 @@ function Index() {
         <OrderForm lang={lang} price={price} available={available} soldOutLabel={soldOutLabel} />
       </section>
 
-      <footer className="py-8 md:py-10 px-6 sm:px-8 md:px-16 bg-[oklch(0.22_0.03_40)] text-white/60 text-xs tracking-widest uppercase flex flex-col md:flex-row justify-between gap-3 md:gap-4 text-center md:text-left">
-        <span>{t.footer.left}</span>
-        <span>{t.footer.right}</span>
-      </footer>
-
       <SiteFooter lang={lang} />
     </div>
+  );
+}
+
+const PHONE = "+212700591954";
+const PHONE_DISPLAY = "+212 700 591 954";
+const EMAIL = "contact@haydar.com";
+const WHATSAPP = "212700591954";
+const SOCIALS = {
+  instagram: "https://www.instagram.com/haydar.elegance?igsh=czF2b3pkZ2R2cTY3",
+  facebook: "https://www.facebook.com/share/195STzgA1h/",
+  tiktok: "https://www.tiktok.com/@haydar.elegance6",
+  linkedin: "https://www.linkedin.com/",
+};
+
+function TikTokIcon({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="currentColor" className={className} aria-hidden="true">
+      <path d="M19.6 6.3a5.6 5.6 0 0 1-3.5-1.3 5.6 5.6 0 0 1-2-3.5h-3.4v13.1a2.9 2.9 0 1 1-2-2.7V8.4a6.3 6.3 0 1 0 5.4 6.2V9.3a8.9 8.9 0 0 0 5.5 1.9V7.8c-.1 0 0-1.5 0-1.5z" />
+    </svg>
+  );
+}
+
+function SiteFooter({ lang }: { lang: Lang }) {
+  const year = new Date().getFullYear();
+  const isFr = lang === "fr";
+  const L = isFr
+    ? {
+        tagline: "Là où la tradition rencontre l'élégance. Gilets marocains faits main, expédiés du Maroc dans le monde entier.",
+        contact: "Contact",
+        follow: "Suivez-nous",
+        service: "Service Client",
+        legal: "Informations Légales",
+        shipping: "Politique d'expédition",
+        returns: "Politique de retour",
+        privacy: "Politique de confidentialité",
+        terms: "Conditions générales",
+        faq: "FAQ",
+        sizes: "Guide des tailles",
+        track: "Suivi de commande",
+        support: "Nous contacter",
+        rights: "Tous droits réservés.",
+        made: "Conçu et fabriqué au Maroc.",
+      }
+    : {
+        tagline: "Where tradition meets elegance. Handcrafted Moroccan waistcoats, shipped worldwide from Morocco.",
+        contact: "Contact",
+        follow: "Follow Us",
+        service: "Customer Service",
+        legal: "Legal",
+        shipping: "Shipping Policy",
+        returns: "Return Policy",
+        privacy: "Privacy Policy",
+        terms: "Terms & Conditions",
+        faq: "FAQ",
+        sizes: "Size Guide",
+        track: "Track Order",
+        support: "Contact Support",
+        rights: "All rights reserved.",
+        made: "Designed and crafted in Morocco.",
+      };
+
+  const socialLink =
+    "grid place-items-center w-10 h-10 rounded-full border border-white/20 text-white/80 hover:text-white hover:bg-white/10 hover:border-white/40 transition-colors";
+  const linkCls = "text-white/60 hover:text-white transition-colors";
+
+  return (
+    <footer className="bg-[oklch(0.18_0.025_40)] text-white/80 border-t border-white/10">
+      <div className="max-w-7xl mx-auto px-6 sm:px-8 md:px-16 py-14 md:py-20">
+        <div className="grid gap-10 md:gap-12 md:grid-cols-2 lg:grid-cols-4">
+          {/* Brand */}
+          <div className="lg:col-span-1">
+            <img src={logoAsset.url} alt="Haydar" className="h-16 mb-5 brightness-0 invert" />
+            <p className="text-sm leading-relaxed text-white/60 max-w-xs">{L.tagline}</p>
+            <div className="flex items-center gap-3 mt-6">
+              <a href={SOCIALS.instagram} target="_blank" rel="noopener noreferrer" aria-label="Instagram" className={socialLink}>
+                <Instagram className="w-4 h-4" />
+              </a>
+              <a href={SOCIALS.facebook} target="_blank" rel="noopener noreferrer" aria-label="Facebook" className={socialLink}>
+                <Facebook className="w-4 h-4" />
+              </a>
+              <a href={SOCIALS.tiktok} target="_blank" rel="noopener noreferrer" aria-label="TikTok" className={socialLink}>
+                <TikTokIcon className="w-4 h-4" />
+              </a>
+              <a href={SOCIALS.linkedin} target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" className={socialLink}>
+                <Linkedin className="w-4 h-4" />
+              </a>
+              <a href={`https://wa.me/${WHATSAPP}`} target="_blank" rel="noopener noreferrer" aria-label="WhatsApp" className={socialLink}>
+                <MessageCircle className="w-4 h-4" />
+              </a>
+            </div>
+          </div>
+
+          {/* Contact */}
+          <div>
+            <h4 className="font-serif text-lg text-white mb-5">{L.contact}</h4>
+            <ul className="space-y-3 text-sm">
+              <li className="flex items-start gap-3">
+                <Phone className="w-4 h-4 mt-0.5 shrink-0 text-white/50" />
+                <a href={`tel:${PHONE}`} className={linkCls}>{PHONE_DISPLAY}</a>
+              </li>
+              <li className="flex items-start gap-3">
+                <MessageCircle className="w-4 h-4 mt-0.5 shrink-0 text-white/50" />
+                <a href={`https://wa.me/${WHATSAPP}`} target="_blank" rel="noopener noreferrer" className={linkCls}>WhatsApp</a>
+              </li>
+              <li className="flex items-start gap-3">
+                <Mail className="w-4 h-4 mt-0.5 shrink-0 text-white/50" />
+                <a href={`mailto:${EMAIL}`} className={linkCls}>{EMAIL}</a>
+              </li>
+              <li className="flex items-start gap-3">
+                <MapPin className="w-4 h-4 mt-0.5 shrink-0 text-white/50" />
+                <span className="text-white/60">Morocco</span>
+              </li>
+            </ul>
+          </div>
+
+          {/* Customer Service */}
+          <div>
+            <h4 className="font-serif text-lg text-white mb-5">{L.service}</h4>
+            <ul className="space-y-3 text-sm">
+              <li><a href="#contact" className={linkCls}>{L.support}</a></li>
+              <li><a href="#contact" className={linkCls}>{L.track}</a></li>
+              <li><a href="#contact" className={linkCls}>{L.sizes}</a></li>
+              <li><a href="#contact" className={linkCls}>{L.faq}</a></li>
+            </ul>
+          </div>
+
+          {/* Legal */}
+          <div>
+            <h4 className="font-serif text-lg text-white mb-5">{L.legal}</h4>
+            <ul className="space-y-3 text-sm">
+              <li><a href="#" className={linkCls}>{L.privacy}</a></li>
+              <li><a href="#" className={linkCls}>{L.terms}</a></li>
+              <li><a href="#" className={linkCls}>{L.shipping}</a></li>
+              <li><a href="#" className={linkCls}>{L.returns}</a></li>
+            </ul>
+          </div>
+        </div>
+
+        <div className="mt-12 pt-6 border-t border-white/10 flex flex-col md:flex-row items-center justify-between gap-3 text-xs text-white/50 tracking-wide">
+          <span>© {year} HAYDAR. {L.rights}</span>
+          <span>{L.made}</span>
+        </div>
+      </div>
+    </footer>
   );
 }
