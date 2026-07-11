@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as TrackRouteImport } from './routes/track'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as SizeGuideRouteImport } from './routes/size-guide'
+import { Route as ShippingRouteImport } from './routes/shipping'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as FaqRouteImport } from './routes/faq'
 import { Route as ContactRouteImport } from './routes/contact'
@@ -30,6 +31,11 @@ const TermsRoute = TermsRouteImport.update({
 const SizeGuideRoute = SizeGuideRouteImport.update({
   id: '/size-guide',
   path: '/size-guide',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ShippingRoute = ShippingRouteImport.update({
+  id: '/shipping',
+  path: '/shipping',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PrivacyRoute = PrivacyRouteImport.update({
@@ -58,6 +64,7 @@ export interface FileRoutesByFullPath {
   '/contact': typeof ContactRoute
   '/faq': typeof FaqRoute
   '/privacy': typeof PrivacyRoute
+  '/shipping': typeof ShippingRoute
   '/size-guide': typeof SizeGuideRoute
   '/terms': typeof TermsRoute
   '/track': typeof TrackRoute
@@ -67,6 +74,7 @@ export interface FileRoutesByTo {
   '/contact': typeof ContactRoute
   '/faq': typeof FaqRoute
   '/privacy': typeof PrivacyRoute
+  '/shipping': typeof ShippingRoute
   '/size-guide': typeof SizeGuideRoute
   '/terms': typeof TermsRoute
   '/track': typeof TrackRoute
@@ -77,6 +85,7 @@ export interface FileRoutesById {
   '/contact': typeof ContactRoute
   '/faq': typeof FaqRoute
   '/privacy': typeof PrivacyRoute
+  '/shipping': typeof ShippingRoute
   '/size-guide': typeof SizeGuideRoute
   '/terms': typeof TermsRoute
   '/track': typeof TrackRoute
@@ -88,6 +97,7 @@ export interface FileRouteTypes {
     | '/contact'
     | '/faq'
     | '/privacy'
+    | '/shipping'
     | '/size-guide'
     | '/terms'
     | '/track'
@@ -97,6 +107,7 @@ export interface FileRouteTypes {
     | '/contact'
     | '/faq'
     | '/privacy'
+    | '/shipping'
     | '/size-guide'
     | '/terms'
     | '/track'
@@ -106,6 +117,7 @@ export interface FileRouteTypes {
     | '/contact'
     | '/faq'
     | '/privacy'
+    | '/shipping'
     | '/size-guide'
     | '/terms'
     | '/track'
@@ -116,6 +128,7 @@ export interface RootRouteChildren {
   ContactRoute: typeof ContactRoute
   FaqRoute: typeof FaqRoute
   PrivacyRoute: typeof PrivacyRoute
+  ShippingRoute: typeof ShippingRoute
   SizeGuideRoute: typeof SizeGuideRoute
   TermsRoute: typeof TermsRoute
   TrackRoute: typeof TrackRoute
@@ -142,6 +155,13 @@ declare module '@tanstack/react-router' {
       path: '/size-guide'
       fullPath: '/size-guide'
       preLoaderRoute: typeof SizeGuideRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/shipping': {
+      id: '/shipping'
+      path: '/shipping'
+      fullPath: '/shipping'
+      preLoaderRoute: typeof ShippingRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/privacy': {
@@ -180,6 +200,7 @@ const rootRouteChildren: RootRouteChildren = {
   ContactRoute: ContactRoute,
   FaqRoute: FaqRoute,
   PrivacyRoute: PrivacyRoute,
+  ShippingRoute: ShippingRoute,
   SizeGuideRoute: SizeGuideRoute,
   TermsRoute: TermsRoute,
   TrackRoute: TrackRoute,
