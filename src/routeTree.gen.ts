@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as TrackRouteImport } from './routes/track'
 import { Route as SizeGuideRouteImport } from './routes/size-guide'
+import { Route as FaqRouteImport } from './routes/faq'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as IndexRouteImport } from './routes/index'
 
@@ -22,6 +23,11 @@ const TrackRoute = TrackRouteImport.update({
 const SizeGuideRoute = SizeGuideRouteImport.update({
   id: '/size-guide',
   path: '/size-guide',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FaqRoute = FaqRouteImport.update({
+  id: '/faq',
+  path: '/faq',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ContactRoute = ContactRouteImport.update({
@@ -38,12 +44,14 @@ const IndexRoute = IndexRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/contact': typeof ContactRoute
+  '/faq': typeof FaqRoute
   '/size-guide': typeof SizeGuideRoute
   '/track': typeof TrackRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/contact': typeof ContactRoute
+  '/faq': typeof FaqRoute
   '/size-guide': typeof SizeGuideRoute
   '/track': typeof TrackRoute
 }
@@ -51,20 +59,22 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/contact': typeof ContactRoute
+  '/faq': typeof FaqRoute
   '/size-guide': typeof SizeGuideRoute
   '/track': typeof TrackRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/contact' | '/size-guide' | '/track'
+  fullPaths: '/' | '/contact' | '/faq' | '/size-guide' | '/track'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/contact' | '/size-guide' | '/track'
-  id: '__root__' | '/' | '/contact' | '/size-guide' | '/track'
+  to: '/' | '/contact' | '/faq' | '/size-guide' | '/track'
+  id: '__root__' | '/' | '/contact' | '/faq' | '/size-guide' | '/track'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ContactRoute: typeof ContactRoute
+  FaqRoute: typeof FaqRoute
   SizeGuideRoute: typeof SizeGuideRoute
   TrackRoute: typeof TrackRoute
 }
@@ -83,6 +93,13 @@ declare module '@tanstack/react-router' {
       path: '/size-guide'
       fullPath: '/size-guide'
       preLoaderRoute: typeof SizeGuideRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/faq': {
+      id: '/faq'
+      path: '/faq'
+      fullPath: '/faq'
+      preLoaderRoute: typeof FaqRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/contact': {
@@ -105,6 +122,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ContactRoute: ContactRoute,
+  FaqRoute: FaqRoute,
   SizeGuideRoute: SizeGuideRoute,
   TrackRoute: TrackRoute,
 }
