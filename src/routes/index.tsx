@@ -363,20 +363,11 @@ function Index() {
     let cancelled = false;
     (async () => {
       try {
-        const res = await fetch(`${PRICING_API_URL}?t=${Date.now()}`, {
-          method: "GET",
-          redirect: "follow",
-          cache: "no-store",
-        });
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        const data = await res.json();
+        const info = await getPrice();
         if (cancelled) return;
-        const cur = data.Prix ?? data.prix ?? data.price ?? data.PrixActuel;
-        const old = data.AncienPrix ?? data.ancienPrix ?? data.oldPrice ?? data.PrixBarre;
-        const disp = data.Disponible ?? data.disponible ?? data.available;
-        if (cur !== undefined && cur !== null && String(cur).trim() !== "") setPrice(String(cur).replace(/[^\d.]/g, "") || String(cur));
-        if (old !== undefined && old !== null && String(old).trim() !== "") setOriginalPrice(String(old).replace(/[^\d.]/g, "") || String(old));
-        if (disp !== undefined && disp !== null) setAvailable(String(disp).toLowerCase() !== "non");
+        if (info.price) setPrice(info.price);
+        if (info.originalPrice) setOriginalPrice(info.originalPrice);
+        setAvailable(info.available);
       } catch (err) {
         console.error("[Pricing] Fetch failed:", err);
       }
