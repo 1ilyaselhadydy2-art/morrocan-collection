@@ -335,7 +335,7 @@ function Index() {
   return (
     <div className="min-h-screen bg-background text-foreground">
       <header className="absolute top-0 left-0 right-0 z-30 flex items-center justify-between px-4 sm:px-6 md:px-16 py-3 md:py-6 gap-2">
-        <img src={logoAsset.url} alt="Haydar" className="h-20 sm:h-28 md:h-44 brightness-0 invert" />
+        <img src={logoUrl} alt="Haydar" className="h-20 sm:h-28 md:h-44 brightness-0 invert" />
         <nav className="hidden md:flex items-center gap-10 text-sm tracking-widest uppercase text-white/80">
           <a href="#collection" className="hover:text-white transition">{t.nav.collection}</a>
           <a href="#heritage" className="hover:text-white transition">{t.nav.heritage}</a>
@@ -356,7 +356,7 @@ function Index() {
         {/* Mobile: full-bleed video background */}
         <div className="md:hidden absolute inset-0 z-0">
           <video
-            src={heroVideo.url}
+            src={heroVideoUrl}
             autoPlay
             muted
             loop
@@ -399,7 +399,7 @@ function Index() {
         </div>
         <div className="relative hidden md:block md:min-h-screen">
           <video
-            src={heroVideo.url}
+            src={heroVideoUrl}
             autoPlay
             muted
             loop
@@ -467,7 +467,7 @@ function Index() {
 
       {/* CTA / CONTACT */}
       <section id="contact" className="py-16 md:py-32 px-6 sm:px-8 md:px-16 text-white text-center" style={{ background: "var(--gradient-hero)" }}>
-        <img src={logoAsset.url} alt="Haydar" className="h-32 sm:h-40 md:h-56 mx-auto mb-6 md:mb-8 brightness-0 invert" />
+        <img src={logoUrl} alt="Haydar" className="h-32 sm:h-40 md:h-56 mx-auto mb-6 md:mb-8 brightness-0 invert" />
         <h2 className="font-serif text-3xl sm:text-4xl md:text-6xl max-w-3xl mx-auto mb-4 md:mb-6 leading-tight">{t.cta.title}</h2>
         <p className="text-white/70 max-w-xl mx-auto mb-8 md:mb-10">{t.cta.desc}</p>
         <OrderForm lang={lang} price={price} available={available} soldOutLabel={soldOutLabel} />
@@ -547,7 +547,7 @@ function SiteFooter({ lang }: { lang: Lang }) {
         <div className="grid gap-10 md:gap-12 md:grid-cols-2 lg:grid-cols-4">
           {/* Brand */}
           <div className="lg:col-span-1">
-            <img src={logoAsset.url} alt="Haydar" className="h-16 mb-5 brightness-0 invert" />
+            <img src={logoUrl} alt="Haydar" className="h-16 mb-5 brightness-0 invert" />
             <p className="text-sm leading-relaxed text-white/60 max-w-xs">{L.tagline}</p>
             <div className="flex items-center gap-3 mt-6">
               <a href={SOCIALS.instagram} target="_blank" rel="noopener noreferrer" aria-label="Instagram" className={socialLink}>
