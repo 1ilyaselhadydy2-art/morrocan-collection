@@ -1,29 +1,26 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState, type FormEvent } from "react";
 import { Link } from "@tanstack/react-router";
-import { Instagram, Facebook, Linkedin, Mail, Phone, MessageCircle, MapPin } from "lucide-react";
+import { Instagram, Facebook, Linkedin, Mail, Phone, MessageCircle, MapPin, Copy, Check } from "lucide-react";
 import { PromoPopup } from "@/components/promo-popup";
-import logoAsset from "@/assets/haydar-logo.png.asset.json";
-import heroVideo from "@/assets/haydar-hero.mp4.asset.json";
-import heroImage from "@/assets/haydar-hero.jpg.asset.json";
-import detailImage from "@/assets/haydar-detail.jpg.asset.json";
-import embroideryImage from "@/assets/haydar-embroidery.jpg.asset.json";
+import logoUrl from "@/assets/haydar-logo.png";
+import heroVideoUrl from "@/assets/haydar-hero.mp4";
+import heroImageUrl from "@/assets/haydar-hero.jpg";
+import detailImageUrl from "@/assets/haydar-detail.jpg";
+import embroideryImageUrl from "@/assets/haydar-embroidery.jpg";
 import fabricTexture from "@/assets/moroccan-fabric-texture.jpg";
+import { createOrder, getPrice } from "@/services/googleSheet";
 
 export const Route = createFileRoute("/")({
   component: Index,
 });
 
 const gallery = [
-  { src: heroImage.url, alt: "Haydar waistcoat worn in the medina of Essaouira" },
-  { src: detailImage.url, alt: "Green star and sfifa braiding detail" },
-  { src: embroideryImage.url, alt: "Maroc 2026 golden trophy embroidery" },
+  { src: heroImageUrl, alt: "Haydar waistcoat worn in the medina of Essaouira" },
+  { src: detailImageUrl, alt: "Green star and sfifa braiding detail" },
+  { src: embroideryImageUrl, alt: "Maroc 2026 golden trophy embroidery" },
 ];
 
-const APPS_SCRIPT_URL =
-  "https://script.google.com/macros/s/AKfycbx8j6jt7jrFrvAJnrOGh8S3UN12JkHow-XrMzeDa7TRWG1TiIWDlbHpFed91qVOcW8f/exec";
-const PRICING_API_URL =
-  "https://script.google.com/macros/s/AKfycbxhUAKirKRXKUSP2YHV4oDCo2062BfLz1vEnC9JGoJkOz8ATHJiDmPAwZPPRtzW4S3rvg/exec";
 const PRODUCT_NAME = "Haydar Maroc 2026 Waistcoat";
 const DEFAULT_PRICE = "69";
 const DEFAULT_PRICE_ORIGINAL = "189";
@@ -161,40 +158,34 @@ function OrderForm({ lang, price, available, soldOutLabel }: { lang: Lang; price
   const [status, setStatus] = useState<"idle" | "sending" | "ok" | "error">("idle");
   const [errorMsg, setErrorMsg] = useState<string>("");
   const [qty, setQty] = useState(1);
+  const [orderNumber, setOrderNumber] = useState<string>("");
+  const [copied, setCopied] = useState(false);
 
   async function onSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const form = e.currentTarget;
     const fd = new FormData(form);
+    const quantite = Number(fd.get("quantite") ?? 1);
     const payload = {
       nom: String(fd.get("nom") ?? ""),
       telephone: String(fd.get("telephone") ?? ""),
       ville: String(fd.get("ville") ?? ""),
       produit: PRODUCT_NAME,
       taille: String(fd.get("taille") ?? ""),
-      quantite: Number(fd.get("quantite") ?? 1),
+      quantite,
       prix: price,
-      source: typeof window !== "undefined" ? window.location.href : "web",
+      source: "Landing Page",
     };
     setStatus("sending");
     setErrorMsg("");
-    console.log("[OrderForm] Envoi vers Apps Script:", APPS_SCRIPT_URL, payload);
     try {
-      const res = await fetch(APPS_SCRIPT_URL, {
-        method: "POST",
-        redirect: "follow",
-        headers: { "Content-Type": "text/plain;charset=utf-8" },
-        body: JSON.stringify(payload),
-      });
-      console.log("[OrderForm] Réponse HTTP:", res.status, res.statusText);
-      const text = await res.text();
-      console.log("[OrderForm] Corps de la réponse:", text);
-      if (!res.ok) throw new Error(`HTTP ${res.status} — ${text || res.statusText}`);
+      const result = await createOrder(payload);
       window.fbq?.("track", "Lead", {
         content_name: PRODUCT_NAME,
-        value: Number(price) * Number(fd.get("quantite") ?? 1),
+        value: Number(price) * quantite,
         currency: "USD",
       });
+      setOrderNumber(result.orderNumber);
       setStatus("ok");
       form.reset();
       setQty(1);
@@ -206,8 +197,77 @@ function OrderForm({ lang, price, available, soldOutLabel }: { lang: Lang; price
     }
   }
 
+  async function copyOrderNumber() {
+    if (!orderNumber) return;
+    try {
+      await navigator.clipboard.writeText(orderNumber);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      /* ignore */
+    }
+  }
+
   const field = "w-full bg-white/10 border border-white/30 px-5 py-3.5 text-sm placeholder:text-white/50 focus:outline-none focus:border-[oklch(0.72_0.14_75)] text-white";
   const label = "text-xs tracking-[0.2em] uppercase text-white/70 mb-2 block text-left";
+
+  if (status === "ok" && orderNumber) {
+    const isFr = lang === "fr";
+    return (
+      <div className="max-w-xl mx-auto text-center animate-fade-in">
+        <div className="rounded-2xl border border-white/20 bg-white/5 backdrop-blur px-6 sm:px-10 py-10">
+          <div className="mx-auto mb-5 grid place-items-center w-14 h-14 rounded-full bg-[oklch(0.55_0.18_145)]/20 border border-[oklch(0.55_0.18_145)]/40">
+            <Check className="w-7 h-7 text-[oklch(0.85_0.15_145)]" />
+          </div>
+          <h3 className="font-serif text-2xl sm:text-3xl mb-3">{isFr ? "Commande confirmée !" : "Order confirmed!"}</h3>
+          <p className="text-white/80 text-sm sm:text-base mb-6">
+            {isFr
+              ? "Conservez précieusement votre numéro de commande — vous en aurez besoin pour suivre l'expédition."
+              : "Please save your order number — you will need it to track your shipment."}
+          </p>
+          <div className="mx-auto max-w-sm">
+            <div className="text-[10px] tracking-[0.3em] uppercase text-white/60 mb-2">
+              {isFr ? "Numéro de commande" : "Order number"}
+            </div>
+            <div className="flex items-stretch gap-2">
+              <div className="flex-1 font-serif text-xl sm:text-2xl bg-white/10 border border-white/30 px-4 py-3 rounded-sm select-all">
+                {orderNumber}
+              </div>
+              <button
+                type="button"
+                onClick={copyOrderNumber}
+                aria-label={isFr ? "Copier" : "Copy"}
+                className="grid place-items-center px-4 border border-white/30 hover:bg-white/10 rounded-sm text-white transition"
+              >
+                {copied ? <Check className="w-5 h-5 text-[oklch(0.85_0.15_145)]" /> : <Copy className="w-5 h-5" />}
+              </button>
+            </div>
+            {copied && (
+              <p className="text-xs text-[oklch(0.85_0.15_145)] mt-2">{isFr ? "Copié !" : "Copied!"}</p>
+            )}
+          </div>
+          <div className="mt-8 flex flex-col sm:flex-row gap-3 justify-center">
+            <Link
+              to="/track"
+              className="bg-[oklch(0.72_0.14_75)] text-[oklch(0.22_0.03_40)] px-6 py-3 text-sm tracking-widest uppercase hover:bg-white transition font-medium rounded-sm"
+            >
+              {isFr ? "Suivre ma commande" : "Track my order"}
+            </Link>
+            <button
+              type="button"
+              onClick={() => {
+                setOrderNumber("");
+                setStatus("idle");
+              }}
+              className="border border-white/40 text-white px-6 py-3 text-sm tracking-widest uppercase hover:bg-white/10 transition rounded-sm"
+            >
+              {isFr ? "Nouvelle commande" : "New order"}
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <form onSubmit={onSubmit} className="max-w-xl mx-auto grid gap-5 text-left">
@@ -249,7 +309,6 @@ function OrderForm({ lang, price, available, soldOutLabel }: { lang: Lang; price
       >
         {!available ? soldOutLabel : status === "sending" ? t.sending : t.submit}
       </button>
-      {status === "ok" && <p className="text-center text-sm text-[oklch(0.85_0.15_145)]">{t.ok}</p>}
       {status === "error" && (
         <p className="text-center text-sm text-red-300">
           {t.err}: {errorMsg || t.err}. {t.errTail}
@@ -304,20 +363,11 @@ function Index() {
     let cancelled = false;
     (async () => {
       try {
-        const res = await fetch(`${PRICING_API_URL}?t=${Date.now()}`, {
-          method: "GET",
-          redirect: "follow",
-          cache: "no-store",
-        });
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        const data = await res.json();
+        const info = await getPrice();
         if (cancelled) return;
-        const cur = data.Prix ?? data.prix ?? data.price ?? data.PrixActuel;
-        const old = data.AncienPrix ?? data.ancienPrix ?? data.oldPrice ?? data.PrixBarre;
-        const disp = data.Disponible ?? data.disponible ?? data.available;
-        if (cur !== undefined && cur !== null && String(cur).trim() !== "") setPrice(String(cur).replace(/[^\d.]/g, "") || String(cur));
-        if (old !== undefined && old !== null && String(old).trim() !== "") setOriginalPrice(String(old).replace(/[^\d.]/g, "") || String(old));
-        if (disp !== undefined && disp !== null) setAvailable(String(disp).toLowerCase() !== "non");
+        if (info.price) setPrice(info.price);
+        if (info.originalPrice) setOriginalPrice(info.originalPrice);
+        setAvailable(info.available);
       } catch (err) {
         console.error("[Pricing] Fetch failed:", err);
       }
@@ -338,7 +388,7 @@ function Index() {
   return (
     <div className="min-h-screen bg-background text-foreground">
       <header className="absolute top-0 left-0 right-0 z-30 flex items-center justify-between px-4 sm:px-6 md:px-16 py-3 md:py-6 gap-2">
-        <img src={logoAsset.url} alt="Haydar" className="h-20 sm:h-28 md:h-44 brightness-0 invert" />
+        <img src={logoUrl} alt="Haydar" className="h-20 sm:h-28 md:h-44 brightness-0 invert" />
         <nav className="hidden md:flex items-center gap-10 text-sm tracking-widest uppercase text-white/80">
           <a href="#collection" className="hover:text-white transition">{t.nav.collection}</a>
           <a href="#heritage" className="hover:text-white transition">{t.nav.heritage}</a>
@@ -359,7 +409,7 @@ function Index() {
         {/* Mobile: full-bleed video background */}
         <div className="md:hidden absolute inset-0 z-0">
           <video
-            src={heroVideo.url}
+            src={heroVideoUrl}
             autoPlay
             muted
             loop
@@ -402,7 +452,7 @@ function Index() {
         </div>
         <div className="relative hidden md:block md:min-h-screen">
           <video
-            src={heroVideo.url}
+            src={heroVideoUrl}
             autoPlay
             muted
             loop
@@ -470,7 +520,7 @@ function Index() {
 
       {/* CTA / CONTACT */}
       <section id="contact" className="py-16 md:py-32 px-6 sm:px-8 md:px-16 text-white text-center" style={{ background: "var(--gradient-hero)" }}>
-        <img src={logoAsset.url} alt="Haydar" className="h-32 sm:h-40 md:h-56 mx-auto mb-6 md:mb-8 brightness-0 invert" />
+        <img src={logoUrl} alt="Haydar" className="h-32 sm:h-40 md:h-56 mx-auto mb-6 md:mb-8 brightness-0 invert" />
         <h2 className="font-serif text-3xl sm:text-4xl md:text-6xl max-w-3xl mx-auto mb-4 md:mb-6 leading-tight">{t.cta.title}</h2>
         <p className="text-white/70 max-w-xl mx-auto mb-8 md:mb-10">{t.cta.desc}</p>
         <OrderForm lang={lang} price={price} available={available} soldOutLabel={soldOutLabel} />
@@ -550,7 +600,7 @@ function SiteFooter({ lang }: { lang: Lang }) {
         <div className="grid gap-10 md:gap-12 md:grid-cols-2 lg:grid-cols-4">
           {/* Brand */}
           <div className="lg:col-span-1">
-            <img src={logoAsset.url} alt="Haydar" className="h-16 mb-5 brightness-0 invert" />
+            <img src={logoUrl} alt="Haydar" className="h-16 mb-5 brightness-0 invert" />
             <p className="text-sm leading-relaxed text-white/60 max-w-xs">{L.tagline}</p>
             <div className="flex items-center gap-3 mt-6">
               <a href={SOCIALS.instagram} target="_blank" rel="noopener noreferrer" aria-label="Instagram" className={socialLink}>

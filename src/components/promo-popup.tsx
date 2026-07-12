@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { X } from "lucide-react";
-import heroVideo from "@/assets/haydar-hero.mp4.asset.json";
+import heroVideoUrl from "@/assets/haydar-hero.mp4";
 import { usePricing } from "@/lib/pricing";
 
 const STORAGE_KEY = "haydar_promo_seen_v1";
@@ -65,7 +65,7 @@ export function PromoPopup() {
         style={{ boxShadow: "var(--shadow-elegant)" }}
       >
         <video
-          src={heroVideo.url}
+          src={heroVideoUrl}
           autoPlay
           muted
           loop
