@@ -1,29 +1,26 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState, type FormEvent } from "react";
 import { Link } from "@tanstack/react-router";
-import { Instagram, Facebook, Linkedin, Mail, Phone, MessageCircle, MapPin } from "lucide-react";
+import { Instagram, Facebook, Linkedin, Mail, Phone, MessageCircle, MapPin, Copy, Check } from "lucide-react";
 import { PromoPopup } from "@/components/promo-popup";
-import logoAsset from "@/assets/haydar-logo.png.asset.json";
-import heroVideo from "@/assets/haydar-hero.mp4.asset.json";
-import heroImage from "@/assets/haydar-hero.jpg.asset.json";
-import detailImage from "@/assets/haydar-detail.jpg.asset.json";
-import embroideryImage from "@/assets/haydar-embroidery.jpg.asset.json";
+import logoUrl from "@/assets/haydar-logo.png";
+import heroVideoUrl from "@/assets/haydar-hero.mp4";
+import heroImageUrl from "@/assets/haydar-hero.jpg";
+import detailImageUrl from "@/assets/haydar-detail.jpg";
+import embroideryImageUrl from "@/assets/haydar-embroidery.jpg";
 import fabricTexture from "@/assets/moroccan-fabric-texture.jpg";
+import { createOrder, getPrice } from "@/services/googleSheet";
 
 export const Route = createFileRoute("/")({
   component: Index,
 });
 
 const gallery = [
-  { src: heroImage.url, alt: "Haydar waistcoat worn in the medina of Essaouira" },
-  { src: detailImage.url, alt: "Green star and sfifa braiding detail" },
-  { src: embroideryImage.url, alt: "Maroc 2026 golden trophy embroidery" },
+  { src: heroImageUrl, alt: "Haydar waistcoat worn in the medina of Essaouira" },
+  { src: detailImageUrl, alt: "Green star and sfifa braiding detail" },
+  { src: embroideryImageUrl, alt: "Maroc 2026 golden trophy embroidery" },
 ];
 
-const APPS_SCRIPT_URL =
-  "https://script.google.com/macros/s/AKfycbx8j6jt7jrFrvAJnrOGh8S3UN12JkHow-XrMzeDa7TRWG1TiIWDlbHpFed91qVOcW8f/exec";
-const PRICING_API_URL =
-  "https://script.google.com/macros/s/AKfycbxhUAKirKRXKUSP2YHV4oDCo2062BfLz1vEnC9JGoJkOz8ATHJiDmPAwZPPRtzW4S3rvg/exec";
 const PRODUCT_NAME = "Haydar Maroc 2026 Waistcoat";
 const DEFAULT_PRICE = "69";
 const DEFAULT_PRICE_ORIGINAL = "189";
