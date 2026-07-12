@@ -158,40 +158,34 @@ function OrderForm({ lang, price, available, soldOutLabel }: { lang: Lang; price
   const [status, setStatus] = useState<"idle" | "sending" | "ok" | "error">("idle");
   const [errorMsg, setErrorMsg] = useState<string>("");
   const [qty, setQty] = useState(1);
+  const [orderNumber, setOrderNumber] = useState<string>("");
+  const [copied, setCopied] = useState(false);
 
   async function onSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const form = e.currentTarget;
     const fd = new FormData(form);
+    const quantite = Number(fd.get("quantite") ?? 1);
     const payload = {
       nom: String(fd.get("nom") ?? ""),
       telephone: String(fd.get("telephone") ?? ""),
       ville: String(fd.get("ville") ?? ""),
       produit: PRODUCT_NAME,
       taille: String(fd.get("taille") ?? ""),
-      quantite: Number(fd.get("quantite") ?? 1),
+      quantite,
       prix: price,
-      source: typeof window !== "undefined" ? window.location.href : "web",
+      source: "Landing Page",
     };
     setStatus("sending");
     setErrorMsg("");
-    console.log("[OrderForm] Envoi vers Apps Script:", APPS_SCRIPT_URL, payload);
     try {
-      const res = await fetch(APPS_SCRIPT_URL, {
-        method: "POST",
-        redirect: "follow",
-        headers: { "Content-Type": "text/plain;charset=utf-8" },
-        body: JSON.stringify(payload),
-      });
-      console.log("[OrderForm] Réponse HTTP:", res.status, res.statusText);
-      const text = await res.text();
-      console.log("[OrderForm] Corps de la réponse:", text);
-      if (!res.ok) throw new Error(`HTTP ${res.status} — ${text || res.statusText}`);
+      const result = await createOrder(payload);
       window.fbq?.("track", "Lead", {
         content_name: PRODUCT_NAME,
-        value: Number(price) * Number(fd.get("quantite") ?? 1),
+        value: Number(price) * quantite,
         currency: "USD",
       });
+      setOrderNumber(result.orderNumber);
       setStatus("ok");
       form.reset();
       setQty(1);
@@ -203,8 +197,77 @@ function OrderForm({ lang, price, available, soldOutLabel }: { lang: Lang; price
     }
   }
 
+  async function copyOrderNumber() {
+    if (!orderNumber) return;
+    try {
+      await navigator.clipboard.writeText(orderNumber);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      /* ignore */
+    }
+  }
+
   const field = "w-full bg-white/10 border border-white/30 px-5 py-3.5 text-sm placeholder:text-white/50 focus:outline-none focus:border-[oklch(0.72_0.14_75)] text-white";
   const label = "text-xs tracking-[0.2em] uppercase text-white/70 mb-2 block text-left";
+
+  if (status === "ok" && orderNumber) {
+    const isFr = lang === "fr";
+    return (
+      <div className="max-w-xl mx-auto text-center animate-fade-in">
+        <div className="rounded-2xl border border-white/20 bg-white/5 backdrop-blur px-6 sm:px-10 py-10">
+          <div className="mx-auto mb-5 grid place-items-center w-14 h-14 rounded-full bg-[oklch(0.55_0.18_145)]/20 border border-[oklch(0.55_0.18_145)]/40">
+            <Check className="w-7 h-7 text-[oklch(0.85_0.15_145)]" />
+          </div>
+          <h3 className="font-serif text-2xl sm:text-3xl mb-3">{isFr ? "Commande confirmée !" : "Order confirmed!"}</h3>
+          <p className="text-white/80 text-sm sm:text-base mb-6">
+            {isFr
+              ? "Conservez précieusement votre numéro de commande — vous en aurez besoin pour suivre l'expédition."
+              : "Please save your order number — you will need it to track your shipment."}
+          </p>
+          <div className="mx-auto max-w-sm">
+            <div className="text-[10px] tracking-[0.3em] uppercase text-white/60 mb-2">
+              {isFr ? "Numéro de commande" : "Order number"}
+            </div>
+            <div className="flex items-stretch gap-2">
+              <div className="flex-1 font-serif text-xl sm:text-2xl bg-white/10 border border-white/30 px-4 py-3 rounded-sm select-all">
+                {orderNumber}
+              </div>
+              <button
+                type="button"
+                onClick={copyOrderNumber}
+                aria-label={isFr ? "Copier" : "Copy"}
+                className="grid place-items-center px-4 border border-white/30 hover:bg-white/10 rounded-sm text-white transition"
+              >
+                {copied ? <Check className="w-5 h-5 text-[oklch(0.85_0.15_145)]" /> : <Copy className="w-5 h-5" />}
+              </button>
+            </div>
+            {copied && (
+              <p className="text-xs text-[oklch(0.85_0.15_145)] mt-2">{isFr ? "Copié !" : "Copied!"}</p>
+            )}
+          </div>
+          <div className="mt-8 flex flex-col sm:flex-row gap-3 justify-center">
+            <Link
+              to="/track"
+              className="bg-[oklch(0.72_0.14_75)] text-[oklch(0.22_0.03_40)] px-6 py-3 text-sm tracking-widest uppercase hover:bg-white transition font-medium rounded-sm"
+            >
+              {isFr ? "Suivre ma commande" : "Track my order"}
+            </Link>
+            <button
+              type="button"
+              onClick={() => {
+                setOrderNumber("");
+                setStatus("idle");
+              }}
+              className="border border-white/40 text-white px-6 py-3 text-sm tracking-widest uppercase hover:bg-white/10 transition rounded-sm"
+            >
+              {isFr ? "Nouvelle commande" : "New order"}
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <form onSubmit={onSubmit} className="max-w-xl mx-auto grid gap-5 text-left">
@@ -246,7 +309,6 @@ function OrderForm({ lang, price, available, soldOutLabel }: { lang: Lang; price
       >
         {!available ? soldOutLabel : status === "sending" ? t.sending : t.submit}
       </button>
-      {status === "ok" && <p className="text-center text-sm text-[oklch(0.85_0.15_145)]">{t.ok}</p>}
       {status === "error" && (
         <p className="text-center text-sm text-red-300">
           {t.err}: {errorMsg || t.err}. {t.errTail}
