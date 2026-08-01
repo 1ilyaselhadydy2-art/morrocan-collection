@@ -135,7 +135,7 @@ export function SiteFooter() {
       <div className="max-w-7xl mx-auto px-6 sm:px-8 md:px-16 py-14 md:py-20">
         <div className="grid gap-10 md:gap-12 md:grid-cols-2 lg:grid-cols-4">
           <div className="lg:col-span-1">
-            <img src={logoUrl} alt="Haydar" className="h-16 mb-5 brightness-0 invert" />
+        <img src={logoUrl} alt="Haydar" width={600} height={600} loading="lazy" decoding="async" className="h-16 w-auto mb-5 brightness-0 invert" />
             <p className="text-sm leading-relaxed text-white/60 max-w-xs">
               Là où la tradition rencontre l'élégance. Gilets marocains faits main, expédiés du Maroc dans le monde entier.
             </p>
