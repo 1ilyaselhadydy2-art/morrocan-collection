@@ -1,15 +1,20 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useState, type FormEvent } from "react";
+import { useEffect, useState, lazy, Suspense, type FormEvent } from "react";
 import { Link } from "@tanstack/react-router";
 import { Instagram, Facebook, Linkedin, Mail, Phone, MessageCircle, MapPin, Copy, Check } from "lucide-react";
-import { PromoPopup } from "@/components/promo-popup";
 import logoUrl from "@/assets/haydar-logo.png";
 import heroVideoUrl from "@/assets/haydar-hero.mp4";
+import heroPoster from "@/assets/haydar-hero-poster.jpg";
 import heroImageUrl from "@/assets/haydar-hero.jpg";
 import detailImageUrl from "@/assets/haydar-detail.jpg";
 import embroideryImageUrl from "@/assets/haydar-embroidery.jpg";
 import fabricTexture from "@/assets/moroccan-fabric-texture.jpg";
-import { createOrder, getPrice } from "@/services/googleSheet";
+import { createOrder } from "@/services/googleSheet";
+import { usePricing } from "@/lib/pricing";
+
+const PromoPopup = lazy(() =>
+  import("@/components/promo-popup").then((m) => ({ default: m.PromoPopup })),
+);
 
 export const Route = createFileRoute("/")({
   component: Index,
@@ -22,8 +27,6 @@ const gallery = [
 ];
 
 const PRODUCT_NAME = "Haydar Maroc 2026 Waistcoat";
-const DEFAULT_PRICE = "69";
-const DEFAULT_PRICE_ORIGINAL = "189";
 const SIZES = ["S", "M", "L", "XL", "XXL"];
 
 declare global {
@@ -333,6 +336,10 @@ function AutoCarousel() {
             key={g.src}
             src={g.src}
             alt={g.alt}
+            width={900}
+            height={1200}
+            loading={idx === 0 ? "eager" : "lazy"}
+            decoding="async"
             className="absolute inset-0 w-full h-full object-cover transition-opacity duration-1000"
             style={{ opacity: i === idx ? 1 : 0 }}
           />
@@ -355,27 +362,7 @@ function AutoCarousel() {
 function Index() {
   const [lang, setLang] = useState<Lang>("en");
   const t = T[lang];
-  const [price, setPrice] = useState<string>(DEFAULT_PRICE);
-  const [originalPrice, setOriginalPrice] = useState<string>(DEFAULT_PRICE_ORIGINAL);
-  const [available, setAvailable] = useState<boolean>(true);
-
-  useEffect(() => {
-    let cancelled = false;
-    (async () => {
-      try {
-        const info = await getPrice();
-        if (cancelled) return;
-        if (info.price) setPrice(info.price);
-        if (info.originalPrice) setOriginalPrice(info.originalPrice);
-        setAvailable(info.available);
-      } catch (err) {
-        console.error("[Pricing] Fetch failed:", err);
-      }
-    })();
-    return () => {
-      cancelled = true;
-    };
-  }, []);
+  const { price, originalPrice, available } = usePricing();
 
   const soldOutLabel = lang === "fr" ? "Rupture de stock" : "Sold out";
 
@@ -388,7 +375,7 @@ function Index() {
   return (
     <div className="min-h-screen bg-background text-foreground">
       <header className="absolute top-0 left-0 right-0 z-30 flex items-center justify-between px-4 sm:px-6 md:px-16 py-3 md:py-6 gap-2">
-        <img src={logoUrl} alt="Haydar" className="h-20 sm:h-28 md:h-44 brightness-0 invert" />
+        <img src={logoUrl} alt="Haydar" width={600} height={600} fetchPriority="high" className="h-20 sm:h-28 md:h-44 w-auto brightness-0 invert" />
         <nav className="hidden md:flex items-center gap-10 text-sm tracking-widest uppercase text-white/80">
           <a href="#collection" className="hover:text-white transition">{t.nav.collection}</a>
           <a href="#heritage" className="hover:text-white transition">{t.nav.heritage}</a>
@@ -406,10 +393,11 @@ function Index() {
 
       {/* HERO */}
       <section className="relative min-h-screen md:grid md:grid-cols-2" style={{ background: "var(--gradient-hero)" }}>
-        {/* Mobile: full-bleed video background */}
-        <div className="md:hidden absolute inset-0 z-0">
+        {/* Single video: full bleed on mobile, right half on desktop */}
+        <div className="absolute inset-0 md:left-1/2 z-0">
           <video
             src={heroVideoUrl}
+            poster={heroPoster}
             autoPlay
             muted
             loop
@@ -417,7 +405,11 @@ function Index() {
             preload="metadata"
             className="absolute inset-0 w-full h-full object-cover"
           />
-          <div className="absolute inset-0 bg-gradient-to-b from-[oklch(0.22_0.03_40)]/70 via-[oklch(0.22_0.03_40)]/55 to-[oklch(0.22_0.03_40)]/85" />
+          <div className="md:hidden absolute inset-0 bg-gradient-to-b from-[oklch(0.22_0.03_40)]/70 via-[oklch(0.22_0.03_40)]/55 to-[oklch(0.22_0.03_40)]/85" />
+          <div className="hidden md:block absolute inset-0 bg-gradient-to-r from-[oklch(0.38_0.14_20)]/60 via-transparent to-transparent" />
+          <div className="hidden md:block absolute bottom-8 right-8 bg-white/95 backdrop-blur px-6 py-4 text-xs tracking-widest uppercase text-[oklch(0.22_0.03_40)] shadow-2xl">
+            <span className="text-[oklch(0.55_0.18_145)]">★</span> {t.hero.badge}
+          </div>
         </div>
         <div className="flex flex-col justify-center px-6 sm:px-8 md:px-16 pt-32 pb-20 md:py-32 text-white relative z-10 min-h-screen md:min-h-0">
           {/* Moroccan fabric texture overlay — left side only, fades toward center */}
@@ -450,21 +442,7 @@ function Index() {
             </div>
           </div>
         </div>
-        <div className="relative hidden md:block md:min-h-screen">
-          <video
-            src={heroVideoUrl}
-            autoPlay
-            muted
-            loop
-            playsInline
-            preload="metadata"
-            className="absolute inset-0 w-full h-full object-cover"
-          />
-          <div className="absolute inset-0 bg-gradient-to-r from-[oklch(0.38_0.14_20)] via-transparent to-transparent md:from-[oklch(0.38_0.14_20)]/60" />
-          <div className="absolute bottom-8 right-8 bg-white/95 backdrop-blur px-6 py-4 text-xs tracking-widest uppercase text-[oklch(0.22_0.03_40)] shadow-2xl">
-            <span className="text-[oklch(0.55_0.18_145)]">★</span> {t.hero.badge}
-          </div>
-        </div>
+        <div className="hidden md:block md:min-h-screen" aria-hidden="true" />
       </section>
 
       {/* PRODUCT DETAIL */}
@@ -520,14 +498,16 @@ function Index() {
 
       {/* CTA / CONTACT */}
       <section id="contact" className="py-16 md:py-32 px-6 sm:px-8 md:px-16 text-white text-center" style={{ background: "var(--gradient-hero)" }}>
-        <img src={logoUrl} alt="Haydar" className="h-32 sm:h-40 md:h-56 mx-auto mb-6 md:mb-8 brightness-0 invert" />
+        <img src={logoUrl} alt="Haydar" width={600} height={600} loading="lazy" decoding="async" className="h-32 sm:h-40 md:h-56 w-auto mx-auto mb-6 md:mb-8 brightness-0 invert" />
         <h2 className="font-serif text-3xl sm:text-4xl md:text-6xl max-w-3xl mx-auto mb-4 md:mb-6 leading-tight">{t.cta.title}</h2>
         <p className="text-white/70 max-w-xl mx-auto mb-8 md:mb-10">{t.cta.desc}</p>
         <OrderForm lang={lang} price={price} available={available} soldOutLabel={soldOutLabel} />
       </section>
 
       <SiteFooter lang={lang} />
-      <PromoPopup />
+      <Suspense fallback={null}>
+        <PromoPopup />
+      </Suspense>
     </div>
   );
 }

@@ -27,7 +27,7 @@ export function SubpageHeader() {
     <header className="sticky top-0 z-30 bg-[oklch(0.22_0.03_40)]/95 backdrop-blur border-b border-white/10">
       <div className="max-w-7xl mx-auto flex items-center justify-between px-4 sm:px-6 md:px-16 py-3 md:py-4">
         <Link to="/" className="flex items-center gap-3">
-          <img src={logoUrl} alt="Haydar" className="h-12 sm:h-14 md:h-16 brightness-0 invert" />
+          <img src={logoUrl} alt="Haydar" width={600} height={600} fetchPriority="high" className="h-12 sm:h-14 md:h-16 w-auto brightness-0 invert" />
         </Link>
         <Link
           to="/"
@@ -135,7 +135,7 @@ export function SiteFooter() {
       <div className="max-w-7xl mx-auto px-6 sm:px-8 md:px-16 py-14 md:py-20">
         <div className="grid gap-10 md:gap-12 md:grid-cols-2 lg:grid-cols-4">
           <div className="lg:col-span-1">
-            <img src={logoUrl} alt="Haydar" className="h-16 mb-5 brightness-0 invert" />
+        <img src={logoUrl} alt="Haydar" width={600} height={600} loading="lazy" decoding="async" className="h-16 w-auto mb-5 brightness-0 invert" />
             <p className="text-sm leading-relaxed text-white/60 max-w-xs">
               Là où la tradition rencontre l'élégance. Gilets marocains faits main, expédiés du Maroc dans le monde entier.
             </p>
