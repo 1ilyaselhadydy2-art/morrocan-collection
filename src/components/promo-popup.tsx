@@ -16,15 +16,47 @@ export function PromoPopup() {
     } catch {
       /* ignore */
     }
-    const id = window.setTimeout(() => {
+
+    let timeElapsed = false;
+    let engaged = false;
+    let done = false;
+
+    const cleanup = () => {
+      window.clearTimeout(timer);
+      window.removeEventListener("scroll", onEngage);
+      window.removeEventListener("pointerdown", onEngage);
+      window.removeEventListener("keydown", onEngage);
+      window.removeEventListener("touchstart", onEngage);
+    };
+
+    const maybeOpen = () => {
+      if (done || !timeElapsed || !engaged) return;
+      done = true;
       setOpen(true);
       try {
         sessionStorage.setItem(STORAGE_KEY, "1");
       } catch {
         /* ignore */
       }
-    }, 4000);
-    return () => window.clearTimeout(id);
+      cleanup();
+    };
+
+    function onEngage() {
+      engaged = true;
+      maybeOpen();
+    }
+
+    const timer = window.setTimeout(() => {
+      timeElapsed = true;
+      maybeOpen();
+    }, 5000);
+
+    window.addEventListener("scroll", onEngage, { passive: true });
+    window.addEventListener("pointerdown", onEngage, { passive: true });
+    window.addEventListener("touchstart", onEngage, { passive: true });
+    window.addEventListener("keydown", onEngage);
+
+    return cleanup;
   }, []);
 
   useEffect(() => {
@@ -70,7 +102,8 @@ export function PromoPopup() {
           muted
           loop
           playsInline
-          preload="metadata"
+          preload="none"
+          poster={heroPoster}
           className="absolute inset-0 w-full h-full object-cover"
         />
         <div className="absolute inset-0 bg-[oklch(0.22_0.03_40)]/75" />
