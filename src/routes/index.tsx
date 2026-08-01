@@ -336,6 +336,10 @@ function AutoCarousel() {
             key={g.src}
             src={g.src}
             alt={g.alt}
+            width={900}
+            height={1200}
+            loading={idx === 0 ? "eager" : "lazy"}
+            decoding="async"
             className="absolute inset-0 w-full h-full object-cover transition-opacity duration-1000"
             style={{ opacity: i === idx ? 1 : 0 }}
           />
