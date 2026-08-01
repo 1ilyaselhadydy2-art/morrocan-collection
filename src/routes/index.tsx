@@ -1,15 +1,20 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useState, type FormEvent } from "react";
+import { useEffect, useState, lazy, Suspense, type FormEvent } from "react";
 import { Link } from "@tanstack/react-router";
 import { Instagram, Facebook, Linkedin, Mail, Phone, MessageCircle, MapPin, Copy, Check } from "lucide-react";
-import { PromoPopup } from "@/components/promo-popup";
 import logoUrl from "@/assets/haydar-logo.png";
 import heroVideoUrl from "@/assets/haydar-hero.mp4";
+import heroPoster from "@/assets/haydar-hero-poster.jpg";
 import heroImageUrl from "@/assets/haydar-hero.jpg";
 import detailImageUrl from "@/assets/haydar-detail.jpg";
 import embroideryImageUrl from "@/assets/haydar-embroidery.jpg";
 import fabricTexture from "@/assets/moroccan-fabric-texture.jpg";
-import { createOrder, getPrice } from "@/services/googleSheet";
+import { createOrder } from "@/services/googleSheet";
+import { usePricing } from "@/lib/pricing";
+
+const PromoPopup = lazy(() =>
+  import("@/components/promo-popup").then((m) => ({ default: m.PromoPopup })),
+);
 
 export const Route = createFileRoute("/")({
   component: Index,
@@ -22,8 +27,6 @@ const gallery = [
 ];
 
 const PRODUCT_NAME = "Haydar Maroc 2026 Waistcoat";
-const DEFAULT_PRICE = "69";
-const DEFAULT_PRICE_ORIGINAL = "189";
 const SIZES = ["S", "M", "L", "XL", "XXL"];
 
 declare global {
