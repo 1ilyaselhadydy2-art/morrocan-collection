@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { X } from "lucide-react";
 import heroVideoUrl from "@/assets/haydar-hero.mp4";
+import heroPoster from "@/assets/haydar-hero-poster.jpg";
 import { usePricing } from "@/lib/pricing";
 
 const STORAGE_KEY = "haydar_promo_seen_v1";
